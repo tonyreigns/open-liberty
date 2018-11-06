@@ -88,53 +88,53 @@ public class OpentracingService {
     /**
      * Check the configuration for filters of a particular type.
      *
-     * @param filters     The resulting list of filters.
-     * @param map         Configuration properties.
+     * @param filters The resulting list of filters.
+     * @param map Configuration properties.
      * @param configAdmin Service to get child configurations.
-     * @param childNames  The name of the configuration element to check for.
-     * @param impl        The filter class to instantiate if an element is found.
-     *                        /
-     *                        private void processFilters(List<SpanFilter> filters, Map<String, Object> map, ConfigurationAdmin configAdmin, String childNames, Class<? extends
-     *                        SpanFilter>
-     *                        impl) {
+     * @param childNames The name of the configuration element to check for.
+     * @param impl The filter class to instantiate if an element is found.
+     *            /
+     *            private void processFilters(List<SpanFilter> filters, Map<String, Object> map, ConfigurationAdmin configAdmin, String childNames, Class<? extends
+     *            SpanFilter>
+     *            impl) {
      *
-     *                        final String methodName = "processFilters";
+     *            final String methodName = "processFilters";
      *
-     *                        String[] children = (String[]) map.get(childNames);
-     *                        if (children != null) {
-     *                        for (String child : children) {
-     *                        try {
-     *                        Configuration config = configAdmin.getConfiguration(child, null);
-     *                        Dictionary<String, Object> childProperties = config.getProperties();
+     *            String[] children = (String[]) map.get(childNames);
+     *            if (children != null) {
+     *            for (String child : children) {
+     *            try {
+     *            Configuration config = configAdmin.getConfiguration(child, null);
+     *            Dictionary<String, Object> childProperties = config.getProperties();
      *
-     *                        String pattern = (String) childProperties.get("pattern");
-     *                        SpanFilterType type = SpanFilterType.valueOf(((String) childProperties.get("type")).trim());
-     *                        boolean ignoreCase = (Boolean) childProperties.get("ignoreCase");
-     *                        boolean regex = (Boolean) childProperties.get("regex");
+     *            String pattern = (String) childProperties.get("pattern");
+     *            SpanFilterType type = SpanFilterType.valueOf(((String) childProperties.get("type")).trim());
+     *            boolean ignoreCase = (Boolean) childProperties.get("ignoreCase");
+     *            boolean regex = (Boolean) childProperties.get("regex");
      *
-     *                        SpanFilter filter = (SpanFilter) Class.forName(impl.getName()).getConstructor(String.class, SpanFilterType.class, boolean.class,
-     *                        boolean.class).newInstance(pattern, type,
-     *                        ignoreCase, regex);
+     *            SpanFilter filter = (SpanFilter) Class.forName(impl.getName()).getConstructor(String.class, SpanFilterType.class, boolean.class,
+     *            boolean.class).newInstance(pattern, type,
+     *            ignoreCase, regex);
      *
-     *                        if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
-     *                        Tr.debug(tc, methodName, "filter " + filter);
-     *                        }
+     *            if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
+     *            Tr.debug(tc, methodName, "filter " + filter);
+     *            }
      *
-     *                        filters.add(filter);
-     *                        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchMethodException | SecurityException |
-     *                        IllegalArgumentException
-     *                        | InvocationTargetException | IOException e) {
-     *                        throw new IllegalStateException(e);
-     *                        }
-     *                        }
-     *                        }
-     *                        }
+     *            filters.add(filter);
+     *            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchMethodException | SecurityException |
+     *            IllegalArgumentException
+     *            | InvocationTargetException | IOException e) {
+     *            throw new IllegalStateException(e);
+     *            }
+     *            }
+     *            }
+     *            }
      */
 
     /**
      * Return true if a span for the specified URI and type should be included.
      *
-     * @param uri  The URI of the request.
+     * @param uri The URI of the request.
      * @param type The type of the request.
      * @return true if a span for the specified URI and type should be included.
      */
@@ -165,7 +165,7 @@ public class OpentracingService {
      * and error.object=<error object instance> to the active span."
      * https://github.com/eclipse/microprofile-opentracing/blob/master/spec/src/main/asciidoc/microprofile-opentracing.asciidoc#server-span-tags
      *
-     * @param span      The span to add the information to.
+     * @param span The span to add the information to.
      * @param exception Optional exception details.
      */
     public static void addSpanErrorInfo(Span span, Throwable exception) {

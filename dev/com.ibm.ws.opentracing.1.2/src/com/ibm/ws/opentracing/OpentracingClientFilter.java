@@ -205,10 +205,10 @@ public class OpentracingClientFilter implements ClientRequestFilter, ClientRespo
 
             scope.span().setTag(Tags.HTTP_STATUS.getKey(), httpStatus);
             if (clientResponseContext.getStatus() >= 400) {
-                scope.span().setTag(Tags.ERROR.getKey(), true);
-                if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
-                    Tr.debug(tc, methodName + " error", clientResponseContext.getStatus());
-                }
+//                scope.span().setTag(Tags.ERROR.getKey(), true);
+//                if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
+//                    Tr.debug(tc, methodName + " error", clientResponseContext.getStatus());
+//                }
             }
 
             if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
