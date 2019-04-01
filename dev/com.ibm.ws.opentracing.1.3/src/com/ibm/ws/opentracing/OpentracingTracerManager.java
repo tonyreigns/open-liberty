@@ -16,6 +16,7 @@ import java.util.Map;
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
 import com.ibm.websphere.ras.annotation.Trivial;
+import com.ibm.ws.opentracing.driver.TracerDriverService;
 
 import io.opentracing.Span;
 import io.opentracing.Tracer;
@@ -29,6 +30,7 @@ import io.opentracing.Tracer;
 public class OpentracingTracerManager {
     private static final TraceComponent tc = Tr.register(OpentracingTracerManager.class);
 
+    private static ClassLoader classLoader;
     //
 
     /**
@@ -72,9 +74,17 @@ public class OpentracingTracerManager {
         synchronized (applicationTracersLock) {
             tracer = getTracer(appName);
             if (tracer == null) {
-                tracer = createTracer(appName);
-                putTracer(appName, tracer);
-                tracerCase = "newly created";
+                tracer = createVendorNeutralTracer(appName);
+                if (tracer == null) {
+                    System.out.println("Jaeger tracer is null!");
+                    tracer = createTracer(appName);
+                }
+                if (tracer != null) {
+                    putTracer(appName, tracer);
+                    tracerCase = "newly created";
+                } else {
+                    tracerCase = "previously created";
+                }
             } else {
                 tracerCase = "previously created";
             }
@@ -98,6 +108,39 @@ public class OpentracingTracerManager {
     @Trivial
     private static Tracer createTracer(String appName) {
         return OpentracingUserFeatureAccessService.getTracerInstance(appName);
+    }
+
+    /**
+     * <p>Have the open tracer factory service create the tracer. That
+     * bridges to a user feature, which enables user supplied tracer
+     * implementations.</p>
+     *
+     * @param appName The name of the application for which to create a tracer.
+     *
+     * @return The new tracer.
+     */
+    @Trivial
+    private static Tracer createVendorNeutralTracer(String appName) {
+        System.setProperty("JAEGER_SERVICE_NAME", "test");
+
+        // Library sharedLib;
+        //classLoader = AdapterUtil.getClassLoaderWithPriv(sharedLib);
+
+        //Tracer tracer = TracerResolver.resolveTracer(classLoader);
+        //System.out.println("Tracer(Jaeger): " + tracer);
+        Tracer tracer = createTracerFromResolver(appName);
+        System.out.println("TRACER: " + tracer);
+        return tracer;
+    }
+
+    private static Tracer createTracerFromResolver(String appName) {
+        TracerDriverService tds = TracerDriverService.getInstance();
+
+        if (tds != null) {
+            return tds.resolveTracer();
+        } else {
+            return null;
+        }
     }
 
     // Open tracing context pass through ...

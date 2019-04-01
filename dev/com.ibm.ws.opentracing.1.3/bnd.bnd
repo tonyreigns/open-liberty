@@ -23,7 +23,8 @@ WS-TraceGroup: OPENTRACING
 
 -dsannotations: com.ibm.ws.opentracing.OpentracingUserFeatureAccessService, \
                 com.ibm.ws.opentracing.OpentracingJaxRsProviderRegister, \
-                com.ibm.ws.opentracing.OpentracingService
+                com.ibm.ws.opentracing.OpentracingService, \
+                com.ibm.ws.opentracing.driver.TracerDriverService
                 
 Import-Package: \
     io.opentracing;version=0.31.0,\
@@ -33,6 +34,7 @@ Import-Package: \
     io.opentracing.util;version=0.31.0,\
     io.opentracing.noop;version=0.31.0,\
     org.eclipse.microprofile.config.*;version="[1.0,2)",\
+    io.opentracing.contrib.tracerresolver, \
     *
 
 
@@ -45,24 +47,33 @@ Export-Package: \
 	io.opentracing.propagation;version=0.31.0,\
 	io.opentracing.tag;version=0.31.0,\
 	io.opentracing.util;version=0.31.0,\
-	io.opentracing.noop;version=0.31.0
-                
-Private-Package: com.ibm.ws.opentracing.resources
+	io.opentracing.noop;version=0.31.0, \
+	io.opentracing.contrib.tracerresolver;version=0.1.5
+               
+Private-Package: com.ibm.ws.opentracing.resources, \
+				 com.ibm.ws.opentracing.driver, \
+				 io.opentracing.contrib.tracerresolver
 
 Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
 
 -buildpath: \
-        com.ibm.websphere.javaee.jaxrs.2.0;version=latest, \
-        com.ibm.ws.logging;version=latest, \
-        com.ibm.ws.org.osgi.annotation.versioning;version=latest, \
-        com.ibm.ws.jaxrs.2.0.common;version=latest, \
-        com.ibm.wsspi.org.osgi.service.component;version=latest, \
-        com.ibm.wsspi.org.osgi.core;version=latest, \
-        com.ibm.wsspi.org.osgi.service.component.annotations;version=latest, \
-        com.ibm.websphere.org.osgi.service.cm;version=latest, \
-        com.ibm.ws.io.opentracing.opentracing-api.0.31.0;version=latest, \
-        com.ibm.ws.io.opentracing.opentracing-util.0.31.0;version=latest, \
-        com.ibm.websphere.org.eclipse.microprofile.config.1.3;version=latest,\
-        com.ibm.websphere.javaee.servlet.3.1; version=latest, \
-        com.ibm.websphere.org.eclipse.microprofile.opentracing.1.3;version=latest
+	com.ibm.websphere.javaee.jaxrs.2.0;version=latest,\
+	com.ibm.ws.logging;version=latest,\
+	com.ibm.ws.org.osgi.annotation.versioning;version=latest,\
+	com.ibm.ws.jaxrs.2.0.common;version=latest,\
+	com.ibm.wsspi.org.osgi.service.component;version=latest,\
+	com.ibm.wsspi.org.osgi.core;version=latest,\
+	com.ibm.wsspi.org.osgi.service.component.annotations;version=latest,\
+	com.ibm.websphere.org.osgi.service.cm;version=latest,\
+	com.ibm.ws.io.opentracing.opentracing-api.0.31.0;version=latest,\
+	com.ibm.ws.io.opentracing.opentracing-util.0.31.0;version=latest,\
+	com.ibm.websphere.org.eclipse.microprofile.config.1.3;version=latest,\
+	com.ibm.websphere.javaee.servlet.3.1;version=latest,\
+	com.ibm.websphere.org.eclipse.microprofile.opentracing.1.3;version=latest,\
+	lib/javax.annotation-api-1.3.2.jar;version=file,\
+	com.ibm.websphere.appserver.spi.classloading,\
+	com.ibm.ws.classloading;version=latest,\
+	com.ibm.websphere.appserver.thirdparty.opentracing.0.31.0
+	
+	
         
