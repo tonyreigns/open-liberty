@@ -44,3 +44,4 @@ Include-Resource: \
 	com.ibm.websphere.javaee.jaxrs.2.0;version=latest,\
 	com.ibm.ws.jaxrs.2.0.common;version=latest,\
 	com.ibm.ws.io.opentracing.opentracing-api.0.31.0;version=latest
+
