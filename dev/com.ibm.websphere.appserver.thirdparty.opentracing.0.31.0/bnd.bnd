@@ -22,13 +22,17 @@ Export-Package: io.opentracing;version=0.31.0, \
     io.opentracing.tag;version=0.31.0, \
     io.opentracing.log;version=0.31.0, \
     io.opentracing.util;version=0.31.0, \
+<<<<<<< HEAD
     io.opentracing.noop;version=0.31.0, \
     io.opentracing.contrib.tracerresolver;version=0.1.5
 
 
+=======
+    io.opentracing.noop;version=0.31.0
+    
+>>>>>>> Jaeger working prototype
 publish.wlp.jar.suffix: dev/api/third-party
 
 -buildpath: \
 	com.ibm.ws.io.opentracing.opentracing-api.0.31.0;version=latest, \
-	com.ibm.ws.io.opentracing.opentracing-util.0.31.0;version=latest, \
-	com.ibm.ws.io.opentracing.contrib.tracerresolver;version=latest
+	com.ibm.ws.io.opentracing.opentracing-util.0.31.0;version=latest
