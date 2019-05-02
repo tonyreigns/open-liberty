@@ -113,6 +113,7 @@ public class OpentracingTracerManager {
     private static Tracer createTracerFromResolver(String appName) {
         TracerDriverService tds = TracerDriverService.getInstance();
         if (tds != null) {
+            System.out.println("Tracer Resolved: " + tds.resolveTracer(appName));
             return tds.resolveTracer(appName);
         } else {
             return null;

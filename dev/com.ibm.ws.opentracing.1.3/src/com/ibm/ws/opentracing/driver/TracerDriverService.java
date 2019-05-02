@@ -89,8 +89,10 @@ public class TracerDriverService implements LibraryChangeListener {
         for (File file : sharedLib.getFiles()) {
             System.out.println("FW share lib file: " + file.getAbsolutePath());
         }
+        System.out.println("Shared LIB GET FILES: " + sharedLib.getFiles());
 
         ClassLoader classloader = getClassLoaderWithPriv(sharedLib);
+        System.out.println("ClassLoader: " + sharedLib);
         ServiceLoader<TracerFactory> sl = ServiceLoader.load(TracerFactory.class, classloader);
         Iterator<TracerFactory> it = sl.iterator();
         while (it.hasNext()) {
@@ -98,6 +100,7 @@ public class TracerDriverService implements LibraryChangeListener {
             System.out.println("FW TracerFactory: " + tf.getClass().getName());
         }
         System.setProperty("JAEGER_SERVICE_NAME", appName);
+        System.out.println("APPNAME: " + appName);
         return TracerResolver.resolveTracer(classloader);
     }
 }
