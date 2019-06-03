@@ -33,7 +33,7 @@ public class MetricRegistry11Impl extends MetricRegistryImpl {
 
     /**
      * Creates a new {@link MetricRegistry}.
-     * 
+     *
      * @param configResolver
      */
     public MetricRegistry11Impl(ConfigProviderResolver configResolver) {
@@ -64,7 +64,7 @@ public class MetricRegistry11Impl extends MetricRegistryImpl {
         metadataCopy.setReusable(metadata.isReusable());
 
         //Append global tags to the metric
-        Config config = configResolver.getConfig(Thread.currentThread().getContextClassLoader());
+        Config config = configResolver.getConfig(SecureActions.getContextClassLoader());
         try {
             String[] globaltags = config.getValue("MP_METRICS_TAGS", String.class).split(",");
             String currentTags = metadataCopy.getTagsAsString();

@@ -13,6 +13,9 @@ package com.ibm.ws.opentracing;
 import java.util.HashMap;
 import java.util.Map;
 
+//import org.slf4j.bridge.SLF4JBridgeHandler;
+//import org.slf4j.impl.JDK14LoggerFactory;
+
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
 import com.ibm.websphere.ras.annotation.Trivial;
@@ -145,6 +148,10 @@ public class OpentracingTracerManager {
                     methodName + " (" + tracerCase + ") in (" + threadName + ":" + Long.toString(threadId) + ")",
                     OpentracingUtils.getTracerText(tracer));
         }
+
+//        JDK14LoggerFactory test = new JDK14LoggerFactory();
+//        test.getLogger(tracerCase);
+
         return tracer;
     }
 

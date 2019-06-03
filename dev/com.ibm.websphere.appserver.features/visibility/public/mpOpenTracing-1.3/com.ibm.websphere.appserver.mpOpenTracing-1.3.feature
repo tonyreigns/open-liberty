@@ -13,6 +13,7 @@ IBM-API-Package: \
   com.ibm.websphere.appserver.org.eclipse.microprofile.opentracing-1.3
 -bundles=\
   com.ibm.ws.require.java8, \
-  com.ibm.ws.microprofile.opentracing.1.3
+  com.ibm.ws.microprofile.opentracing.1.3, \
+  com.ibm.ws.org.slf4j.api
 kind=ga
 edition=core
