@@ -28,7 +28,7 @@ import componenttest.topology.impl.LibertyServerFactory;
 @RunWith(Suite.class)
 @SuiteClasses({
     TestSpanUtils.class,
-    FATOpentracing.class,
+    //FATOpentracing.class,
     FATOpentracingHelloWorld.class,
     FATMPOpenTracing.class
 //    MicroProfileNoTracer.class,

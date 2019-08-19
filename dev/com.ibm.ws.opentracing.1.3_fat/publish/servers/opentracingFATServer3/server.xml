@@ -14,6 +14,14 @@
 
   <logging traceSpecification="*=info:com.ibm.ws.opentracing*=all:com.ibm.ws.microprofile.opentracing*=all:CDI=all:com.ibm.ws.cdi*=all" maxFileSize="100" maxFiles="1" />
 
+<!-- <javaPermission className="java.security.AllPermission"/>  -->
+
+<!-- <javaPermission className="java.util.PropertyPermission" name="slf4j.detectLoggerNameMismatch" actions="read" restriction="true" /> -->
+
+
+
+
+<javaPermission codebase="${server.config.dir}/lib/slf4j-api-1.7.26.jar" className="java.security.AllPermission"/>  
 
 <library id="jaeger" apiTypeVisibility="spec,ibm-api,stable,third-party">
         <file name="${server.config.dir}/lib/jaeger-tracerresolver-0.33.1.jar" />
@@ -23,6 +31,6 @@
         <file name="${server.config.dir}/lib/slf4j-api-1.7.26.jar" />
         <file name="${server.config.dir}/lib/slf4j-simple-1.7.26.jar" />
         <file name="${server.config.dir}/lib/libthrift-0.11.0.jar" /> 
-        <file name="${server.config.dir}/lib/gson-2.8.2.jar" />       
+        <file name="${server.config.dir}/lib/gson-2.8.2.jar" />    
     </library>
 </server>
