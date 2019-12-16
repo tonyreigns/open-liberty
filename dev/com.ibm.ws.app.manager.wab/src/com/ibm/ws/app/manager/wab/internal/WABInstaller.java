@@ -12,6 +12,8 @@
  *******************************************************************************/
 package com.ibm.ws.app.manager.wab.internal;
 
+import static org.osgi.framework.Constants.OBJECTCLASS;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -99,6 +101,7 @@ import com.ibm.wsspi.adaptable.module.NonPersistentCache;
 import com.ibm.wsspi.adaptable.module.UnableToAdaptException;
 import com.ibm.wsspi.artifact.ArtifactContainer;
 import com.ibm.wsspi.artifact.factory.ArtifactContainerFactory;
+import com.ibm.wsspi.http.VirtualHost;
 import com.ibm.wsspi.kernel.service.location.VariableRegistry;
 import com.ibm.wsspi.kernel.service.utils.AtomicServiceReference;
 import com.ibm.wsspi.kernel.service.utils.FileUtils;
@@ -234,7 +237,6 @@ public class WABInstaller implements EventHandler, ExtensionFactory, RuntimeUpda
     private BundleContext ctx = null;
 
     private ServiceTracker<EbaProvider, EbaProvider> ebaProviderTracker;
-
     private final Map<String, WABPathSpecificItemHolder> knownPaths = new HashMap<String, WABPathSpecificItemHolder>();
     private final Hashtable<String, WABPathSpecificItemHolder> wabsEligibleForCollisionResolution = new Hashtable<String, WABPathSpecificItemHolder>();
 
@@ -402,6 +404,29 @@ public class WABInstaller implements EventHandler, ExtensionFactory, RuntimeUpda
 
     protected String resolveVariable(String stringToResolve) {
         return variableRegistrySRRef.getService().resolveString(stringToResolve);
+    }
+
+    protected boolean isVirtualHostValid(String virtualHostName) {
+        String filterString = "(&(" + OBJECTCLASS +
+                              "=" + VirtualHost.class.getName() + ")(id=" + virtualHostName + "))";
+        try {
+
+            Collection<ServiceReference<VirtualHost>> serviceReferences = ctx.getServiceReferences(VirtualHost.class, filterString);
+            ServiceReference<VirtualHost> serviceReference = null;
+            if (!serviceReferences.isEmpty()) {
+                serviceReference = serviceReferences.iterator().next();
+                VirtualHost v = ctx.getService(serviceReference);
+                if (v != null && !v.getAliases().isEmpty()) {
+                    return true;
+                }
+            }
+        } catch (InvalidSyntaxException e1) {
+            // TODO Auto-generated catch block
+            // Do you need FFDC here? Remember FFDC instrumentation and @FFDCIgnore
+            e1.printStackTrace();
+            Tr.error(tc, e1.getMessage());
+        }
+        return false;
     }
 
     /**

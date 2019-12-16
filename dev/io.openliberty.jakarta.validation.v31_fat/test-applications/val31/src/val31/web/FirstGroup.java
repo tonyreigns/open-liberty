@@ -10,6 +10,10 @@
  *******************************************************************************/
 package val31.web;
 
+dependencies {
+  requiredLibs project(':com.ibm.ws.kernel.boot')
+}
+
 /**
  *
  */
