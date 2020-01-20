@@ -18,7 +18,7 @@ bVersion=1.0
 
 
 Web-ContextPath: ibm/api
-OL-VirtualHost: admin_host
+OL-VirtualHost: liberty_admin_host
 
 IBM-Authorization-Roles: com.ibm.ws.management
 IBM-Web-Extension-Processing-Disabled: true
