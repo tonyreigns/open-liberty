@@ -12,7 +12,7 @@ package com.ibm.ws.logging.internal.impl;
 
 public interface LoggingConstants {
     public static enum TraceFormat {
-        BASIC, ENHANCED, ADVANCED;
+        BASIC, TBASIC, ENHANCED, ADVANCED;
     }
 
     String DEFAULT_LOG_LEVEL = "AUDIT";
@@ -40,6 +40,7 @@ public interface LoggingConstants {
 
     String DEFAULT_MESSAGE_SOURCE = "message";
     String DEFAULT_MESSAGE_FORMAT = "simple";
+    String TBASIC_MESSAGE_FORMAT = "tbasic";
     String DEFAULT_CONSOLE_SOURCE = "message";
     String DEFAULT_CONSOLE_FORMAT = "dev";
     String DEFAULT_TRACE_SOURCE = "trace";

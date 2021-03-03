@@ -278,7 +278,7 @@ public class LoggingConfigUtils {
 
     public static boolean isMessageFormatValueValid(String formatValue) {
         if (formatValue.toLowerCase().equals(LoggingConstants.DEFAULT_MESSAGE_FORMAT) || formatValue.toLowerCase().equals(LoggingConstants.JSON_FORMAT)
-            || formatValue.toLowerCase().equals(LoggingConstants.DEPRECATED_DEFAULT_FORMAT)) {
+            || formatValue.toLowerCase().equals(LoggingConstants.TBASIC_MESSAGE_FORMAT) || formatValue.toLowerCase().equals(LoggingConstants.DEPRECATED_DEFAULT_FORMAT)) {
             return true;
         }
         return false;

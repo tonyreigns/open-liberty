@@ -208,10 +208,10 @@ public class BaseTraceFormatter extends Formatter {
      *
      * @param logRecord
      * @param id
-     * @param formattedMsg        the result of {@link #formatMessage}, or null if that
-     *                                method was not previously called
+     * @param formattedMsg the result of {@link #formatMessage}, or null if that
+     *            method was not previously called
      * @param formattedVerboseMsg the result of {@link #formatVerboseMessage},
-     *                                or null if that method was not previously called
+     *            or null if that method was not previously called
      * @return
      */
     public String traceLogFormat(LogRecord logRecord, Object id, String formattedMsg, String formattedVerboseMsg) {
@@ -259,7 +259,7 @@ public class BaseTraceFormatter extends Formatter {
      * formatObj(...) to the log record message.
      *
      * @param logRecord
-     * @param logParams         the parameters for the message
+     * @param logParams the parameters for the message
      * @param useResourceBundle
      * @return
      */
@@ -312,8 +312,8 @@ public class BaseTraceFormatter extends Formatter {
      * reused if specified and no parameters need to be modified.
      *
      * @param logRecord
-     * @param msg       the result of {@link #formatMessage}, or null if that method
-     *                      was not previously called
+     * @param msg the result of {@link #formatMessage}, or null if that method
+     *            was not previously called
      * @return
      */
     public String formatVerboseMessage(LogRecord logRecord, String msg) {
@@ -327,8 +327,8 @@ public class BaseTraceFormatter extends Formatter {
      * reused if specified and no parameters need to be modified.
      *
      * @param logRecord
-     * @param formattedMsg      the result of {@link #formatMessage}, or null if that
-     *                              method was not previously called
+     * @param formattedMsg the result of {@link #formatMessage}, or null if that
+     *            method was not previously called
      * @param useResourceBundle
      * @return the formatted message
      */
@@ -400,7 +400,7 @@ public class BaseTraceFormatter extends Formatter {
      * messages
      *
      * @param logRecord
-     * @param txt       the result of {@link #formatMessage}
+     * @param txt the result of {@link #formatMessage}
      * @return Formatted string for the console
      */
     public String consoleLogFormat(LogRecord logRecord, String txt) {
@@ -549,6 +549,61 @@ public class BaseTraceFormatter extends Formatter {
     }
 
     /**
+     * The messages log always uses the same/enhanced format, and relies on already formatted
+     * messages. This does the formatting needed to take a message suitable for console.log
+     * and wrap it to fit into messages.log.
+     *
+     * @param genData
+     * @return Formatted string for messages.log
+     */
+    public String messageLogFormatTBasic(GenericData genData) {
+        // This is a very light trace format, based on enhanced:
+        StringBuilder sb = new StringBuilder(256);
+        String name = null;
+        KeyValuePair[] pairs = genData.getPairs();
+        KeyValuePair kvp = null;
+        String message = null;
+        Long datetime = null;
+        String level = "";
+        String loggerName = null;
+        String srcClassName = null;
+        String throwable = null;
+        for (KeyValuePair p : pairs) {
+
+            if (p != null && !p.isList()) {
+
+                kvp = p;
+                if (kvp.getKey().equals(LogFieldConstants.MESSAGE)) {
+                    message = kvp.getStringValue();
+                } else if (kvp.getKey().equals(LogFieldConstants.IBM_DATETIME)) {
+                    datetime = kvp.getLongValue();
+                } else if (kvp.getKey().equals(LogFieldConstants.SEVERITY)) {
+                    level = kvp.getStringValue();
+                } else if (kvp.getKey().equals(LogFieldConstants.MODULE)) {
+                    loggerName = fixedClassString(kvp.getStringValue(), basicNameLength);
+                } else if (kvp.getKey().equals(LogFieldConstants.IBM_CLASSNAME)) {
+                    srcClassName = fixedClassString(kvp.getStringValue(), basicNameLength);
+                } else if (kvp.getKey().equals(LogFieldConstants.THROWABLE)) {
+                    throwable = kvp.getStringValue();
+                }
+
+            }
+        }
+        name = nonNullString(loggerName, srcClassName);
+        sb.append('[').append(DateFormatHelper.formatTime(datetime, useIsoDateFormat)).append("] ");
+        sb.append(DataFormatHelper.getThreadId()).append(' ');
+        formatFixedString(sb, name, enhancedNameLength);
+        sb.append(" " + level + " "); // sym has built-in padding
+        sb.append(message);
+
+        if (throwable != null) {
+            sb.append(LoggingConstants.nl).append(throwable);
+        }
+
+        return sb.toString();
+    }
+
+    /**
      * Format the given record into the desired trace format
      *
      * @param name
@@ -596,6 +651,26 @@ public class BaseTraceFormatter extends Formatter {
                     sb.append(LoggingConstants.nl).append(stackTrace);
                 break;
             case BASIC:
+                name = nonNullString(logRecord.getLoggerName(), logRecord.getSourceClassName());
+
+                sb.append(' '); // pad after thread id
+                fixedClassString(sb, name, basicNameLength);
+                sb.append(sym);
+
+                if (className != null)
+                    sb.append(className);
+                sb.append(' '); // yes, this space is always there.
+
+                if (method != null)
+                    sb.append(method);
+                sb.append(' '); // yes, this space is always there.
+
+                // append formatted message -- includes formatted args
+                sb.append(txt);
+                if (stackTrace != null)
+                    sb.append(nlBasicPadding).append(stackTrace);
+                break;
+            case TBASIC:
                 name = nonNullString(logRecord.getLoggerName(), logRecord.getSourceClassName());
 
                 sb.append(' '); // pad after thread id
@@ -787,6 +862,26 @@ public class BaseTraceFormatter extends Formatter {
                 if (stackTrace != null)
                     sb.append(nlBasicPadding).append(stackTrace);
                 break;
+            case TBASIC:
+                name = nonNullString(loggerName, className);
+
+                sb.append(' '); // pad after thread id
+                fixedClassString(sb, name, basicNameLength);
+                sb.append(sym);
+
+                if (className != null)
+                    sb.append(className);
+                sb.append(' '); // yes, this space is always there.
+
+                if (method != null)
+                    sb.append(method);
+                sb.append(' '); // yes, this space is always there.
+
+                // append formatted message -- includes formatted args
+                sb.append(txt);
+                if (stackTrace != null)
+                    sb.append(nlBasicPadding).append(stackTrace);
+                break;
             case ADVANCED:
                 objId = generateObjectId(id, false);
                 name = nonNullString(loggerName, null);
@@ -908,6 +1003,26 @@ public class BaseTraceFormatter extends Formatter {
         }
     }
 
+    private String fixedClassString(String s, int len) {
+        String output;
+        if (s == null)
+            s = "null";
+
+        int i = s.lastIndexOf('.');
+        if (i >= 0) {
+            s = s.substring(i + 1);
+        }
+
+        if (s.length() > len) {
+            output = s.substring(0, len);
+        } else {
+            output = s;
+            if (len > s.length())
+                output = s;
+        }
+        return output;
+    }
+
     private String formatTraceable(Traceable t) {
         String formatted;
         try {
@@ -936,6 +1051,8 @@ public class BaseTraceFormatter extends Formatter {
         if (TraceFormat.ADVANCED.equals(traceFormat)) {
             nlPad = nlAdvancedPadding;
         } else if (TraceFormat.BASIC.equals(traceFormat)) {
+            nlPad = nlBasicPadding;
+        } else if (TraceFormat.TBASIC.equals(traceFormat)) {
             nlPad = nlBasicPadding;
         } else {
             nlPad = nlEnhancedPadding;

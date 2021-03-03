@@ -53,6 +53,7 @@
             ibm:variable="com.ibm.ws.logging.message.format"
             id="messageFormat" required="false" type="String" default="SIMPLE">
             <Option label="%message.format.simple" value="SIMPLE"/>
+            <Option label="%message.format.tbasic" value="TBASIC"/>
             <Option label="%message.format.json" value="JSON"/>
         </AD>
         

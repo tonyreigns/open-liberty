@@ -53,6 +53,7 @@
             ibm:variable="com.ibm.ws.logging.message.format"
             id="messageFormat" required="false" type="String" default="SIMPLE">
             <Option label="%message.format.simple" value="SIMPLE"/>
+            <Option label="%message.format.tbasic" value="TBASIC"/>
             <Option label="%message.format.json" value="JSON"/>
         </AD>
         
@@ -73,6 +74,7 @@
             ibm:variable="com.ibm.ws.logging.trace.format"
             id="traceFormat" required="false" type="String" default="ENHANCED">
             <Option label="%trace.basic" value="BASIC"/>
+            <Option label="%trace.tbasic" value="TBASIC"/>
             <Option label="%trace.enhanced" value="ENHANCED"/>
             <Option label="%trace.advanced" value="ADVANCED"/>
         </AD>
