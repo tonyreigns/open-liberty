@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 /**
- * @version 3.0
+ * @version 2.0
  */
-@org.osgi.annotation.versioning.Version("3.0")
+@org.osgi.annotation.versioning.Version("2.0")
 package io.openliberty.opentracing.internal.mock;
