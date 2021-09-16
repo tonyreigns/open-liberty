@@ -15,6 +15,8 @@ Bundle-Name: Opentracing 3.0 CDI
 Bundle-SymbolicName: io.openliberty.opentracing.3.0.internal.cdi
 Bundle-Description: CDI support for Opentracing 3.0; version=${bVersion}
 
+jakartaeeMe: true
+
 WS-TraceGroup: OPENTRACING
 
 Export-Package:\
