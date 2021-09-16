@@ -11,6 +11,7 @@
 -include= ~../cnf/resources/bnd/bundle.props
 bVersion=1.0
 
+jakartaeeMe: true
 
 Bundle-Name: io.openliberty.microprofile.opentracing.3.0.internal
 Bundle-SymbolicName: io.openliberty.microprofile.opentracing.3.0.internal

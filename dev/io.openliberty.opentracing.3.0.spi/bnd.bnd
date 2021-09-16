@@ -11,6 +11,8 @@
 -include= ~../cnf/resources/bnd/bundle.props
 bVersion: 1.0
 
+jakartaeeMe: true
+
 Bundle-Name: WebSphere OpenTracing 3.0 SPI
 Bundle-Description: WebSphere OpenTracing SPI, version 3.0
 Bundle-SymbolicName: io.openliberty.opentracing.3.0.spi

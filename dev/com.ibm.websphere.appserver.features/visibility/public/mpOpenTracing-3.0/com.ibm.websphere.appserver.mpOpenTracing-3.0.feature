@@ -11,7 +11,9 @@ IBM-API-Package: \
 -features=com.ibm.websphere.appserver.opentracing-3.0, \
   com.ibm.websphere.appserver.mpConfig-3.0, \
   com.ibm.websphere.appserver.org.eclipse.microprofile.opentracing-3.0, \
-  io.openliberty.mpCompatible-5.0
+  io.openliberty.mpCompatible-5.0, \
+  io.openliberty.jakarta.cdi-3.0, \
+  io.openliberty.jakarta.annotation-2.0
 -bundles=\
     io.openliberty.microprofile.opentracing.3.0.internal
 kind=ga
