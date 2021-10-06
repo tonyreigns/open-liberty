@@ -1,10 +1,13 @@
 /*******************************************************************************
-* Copyright (c) 2021 IBM Corporation and others.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Eclipse Public License v1.0
-* which accompanies this distribution, and is available atn * http://www.eclipse.org/legal/epl-v10.htmln *n * Contributors:
-*     IBM Corporation - initial API and implementation
-*******************************************************************************/
+ * Copyright (c) 2021 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package com.ibm.ws.fat.wc.tests;
 
 import static org.junit.Assert.assertEquals;
@@ -39,6 +42,8 @@ import com.ibm.websphere.simplicity.log.Log;
 
 import componenttest.annotation.Server;
 import componenttest.custom.junit.runner.FATRunner;
+import componenttest.custom.junit.runner.Mode;
+import componenttest.custom.junit.runner.Mode.TestMode;
 import componenttest.topology.impl.LibertyServer;
 import componenttest.topology.utils.ServerFileUtils;
 
@@ -206,9 +211,9 @@ public class WCResponseHeadersTest {
     /**
      * Utility method to write a key-value propery to the server's boostrap.properties file
      *
-     * @param server - server instance
+     * @param server   - server instance
      * @param property - name of the property to add
-     * @param value - value of the property to add
+     * @param value    - value of the property to add
      */
     private static void writeBootstrapProperty(LibertyServer server, String property, String value) throws Exception {
 
@@ -267,7 +272,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setRemove("${remove.header}");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         //Send the request and verify the expected headers
 
@@ -310,6 +315,7 @@ public class WCResponseHeadersTest {
      * @throws Exception
      */
     @Test
+    @Mode(TestMode.FULL)
     public void testHeaderMisconfiguration_EmptyHeaderName() throws Exception {
 
         String testName = "testHeaderMisconfiguration_EmptyHeaderName";
@@ -327,7 +333,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setRemove("customHeader, ");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -377,6 +383,7 @@ public class WCResponseHeadersTest {
      * @throws Exception
      */
     @Test
+    @Mode(TestMode.FULL)
     public void testHeaderMisconfiguration_DuplicateHeaderName() throws Exception {
 
         String testName = "testHeaderMisconfiguration_DuplicateHeaderName";
@@ -395,7 +402,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setRemove("yetAnotherBadHeader, customHeader");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -447,6 +454,7 @@ public class WCResponseHeadersTest {
      * @throws Exception
      */
     @Test
+    @Mode(TestMode.FULL)
     public void testHeaderMisconfiguration_PreviouslyDuplicatedHeaderName() throws Exception {
 
         String testName = "testHeaderMisconfiguration_PreviouslyDuplicatedHeaderName";
@@ -464,7 +472,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setRemove("anotherBadHeader, customHeader");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -526,6 +534,7 @@ public class WCResponseHeadersTest {
      * @throws Exception
      */
     @Test
+    @Mode(TestMode.FULL)
     public void testHeaderMisconfiguration_CaseInsensitivity() throws Exception {
         String testName = "testHeaderCaseInsensitivity";
         String url = generateURL("/ResponseHeadersServlet?testCondition=singleHeader");
@@ -541,7 +550,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setRemove("BADHEADER, DATE");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -592,7 +601,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setAdd("customHeader:testValue, customHeader:testValue2");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -636,7 +645,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setSet("customHeader:testValue");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -681,7 +690,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setSetIfMissing("customHeader:testValue");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -728,7 +737,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setRemove("customHeader");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -774,7 +783,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setAdd("customHeader:testValue");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -825,7 +834,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setSet("customHeader:testValue");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -876,7 +885,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setSetIfMissing("customHeader:testValue");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -926,7 +935,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setRemove("customHeader, customConfigHeader");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -937,6 +946,51 @@ public class WCResponseHeadersTest {
         expectations.expectPresent("appVerificationHeader");
         expectations.expectMissing("customConfigHeader");
         expectations.expectMissing("customHeader");
+
+        expectations.evaluate(headers);
+    }
+
+    /**
+     *
+     * Tests the "remove" configuration of the <headers> element by specifying
+     * a header that will not be present in the response.
+     *
+     * The application will add the [appVerificationHeader] header to the response. No further
+     * application interaction is expected.
+     *
+     * The header [undefinedHeader] will be configured in the remove option, but will not be
+     * present on the response. A status 200 is expected with no [undefinedHeader] added
+     * to the response.
+     *
+     * Expected present headers: [appVerificationHeader]
+     * Expected missing headers: [undefinedHeader]
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testRemoveMissingHeader() throws Exception {
+
+        String url = generateURL("/ResponseHeadersServlet");
+        String testName = "testRemoveMissingHeader";
+        restoreSavedConfig = true;
+
+        ServerConfiguration configuration = server.getServerConfiguration();
+        Log.info(ME, testName, "Server configuration that was saved: " + configuration);
+
+        HttpEndpoint httpEndpoint = configuration.getHttpEndpoints().getById("defaultHttpEndpoint");
+        httpEndpoint.getHeaders().setRemove("undefinedHeader");
+        server.setMarkToEndOfLog();
+        server.updateServerConfiguration(configuration);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
+
+        Log.info(ME, testName, "Updated server configuration: " + configuration);
+
+        //Send the request and verify the expected headers
+        Header[] headers = executeExchangeAndGetHeaders(url, testName);
+
+        HeaderExpectations expectations = new HeaderExpectations();
+        expectations.expectPresent("appVerificationHeader");
+        expectations.expectMissing("undefinedHeader");
 
         expectations.evaluate(headers);
     }
@@ -982,7 +1036,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setAdd("set-cookie:oatmeal");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -1037,7 +1091,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setSet("set-cookie:oatmeal");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -1093,8 +1147,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setSetIfMissing("set-cookie:oatmeal");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
-
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
         //Send the request and verify the expected headers
@@ -1148,7 +1201,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setRemove("set-cookie");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -1163,7 +1216,31 @@ public class WCResponseHeadersTest {
 
     }
 
+    /**
+     * Tests that the configuration is applied to all responses in the process of authenticating
+     * an end-user to a secure application. The server configuration will configure the "add" attribute
+     * with the header [foo:bar].
+     *
+     * First Request:
+     * Expected response code: 302
+     * Expected response header: [foo:bar]
+     *
+     * Second Request: Login Page
+     * Expected response code: 200
+     * Expected response header: [foo:bar]
+     *
+     * Third Request: Perform Login
+     * Expected response code: 302
+     * Expected response header: [foo:bar]
+     *
+     * Fourth Request: Application Servlet
+     * Expected response code: 200
+     * Expected response header: [foo:bar]
+     *
+     * @throws Exception
+     */
     @Test
+    @Mode(TestMode.FULL)
     public void testHeadersDuringLogin() throws Exception {
 
         String testName = "testHeadersDuringLogin";
@@ -1180,10 +1257,17 @@ public class WCResponseHeadersTest {
         server.setMarkToEndOfLog();
         server.setServerConfigurationFile("serverConfigs/ResponseHeadersServer.xml");
         server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME_SECURE_APP), true, "CWWKT0016I:.*SameSiteSecurityTest.*");
+
         // Wait for LTPA key to be available to avoid CWWKS4000E
         // CWWKS4105I: LTPA configuration is ready after x seconds
         assertNotNull("CWWKS4105I LTPA configuration message not found.",
                       server.waitForStringInLogUsingMark("CWWKS4105I.*"));
+
+        // CWWKO0219I: TCP Channel defaultHttpEndpoint-ssl has been started and is now listening for
+        // requests on host * (IPv6) port 8020.
+        assertNotNull("CWWKO0219I: TCP Channel defaultHttpEndpoint-ssl message was not found",
+                      server.waitForStringInLogUsingMark("CWWKO0219I:.*defaultHttpEndpoint-ssl"));
+
         configuration = server.getServerConfiguration();
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -1336,7 +1420,7 @@ public class WCResponseHeadersTest {
         httpEndpoint.getHeaders().setAdd("addHeader");
         server.setMarkToEndOfLog();
         server.updateServerConfiguration(configuration);
-        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false);
+        server.waitForConfigUpdateInLogUsingMark(Collections.singleton(APP_NAME), false, "CWWKT0016I:.*ResponseHeadersTest.*");
 
         Log.info(ME, testName, "Updated server configuration: " + configuration);
 
@@ -1364,7 +1448,8 @@ public class WCResponseHeadersTest {
         //be not be present.
         List<Integer> expectedMissingHeaderNames = new ArrayList<Integer>();
 
-        private HeaderExpectations() {};
+        private HeaderExpectations() {
+        };
 
         private void expectPresent(String headerName) {
             expectPresent(headerName, null);
