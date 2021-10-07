@@ -58,14 +58,18 @@ public class OpentracingClientFilter implements ClientRequestFilter, ClientRespo
     private static final String TAG_COMPONENT_JAXRS = "jaxrs";
 
     private OpentracingFilterHelper helper;
+    OpentracingClientFilter clientFilter;
 
     public OpentracingClientFilter() {
         helper = OpentracingJaxRsProviderRegister.getInstance().getOpentracingFilterHelper();
     }
-//    OpentracingClientFilter(OpentracingFilterHelper helper) {
-//        setFilterHelper(helper);
-//    }
+    
+    public OpentracingClientFilter(OpentracingFilterHelper helper) {
+    	clientFilter = new OpentracingClientFilter(helper);
+    }
 
+    
+    
     void setFilterHelper(OpentracingFilterHelper helper) {
         this.helper = helper;
     }

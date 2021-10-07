@@ -22,7 +22,6 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
-import com.ibm.ws.jaxrs20.providers.api.JaxRsProviderRegister;
 
 /**
  * <p>The open tracing filter service.</p>
