@@ -14,8 +14,9 @@ IBM-API-Package: io.opentracing;  type="third-party",\
   io.openliberty.jakarta.cdi-3.0, \
   io.openliberty.jakarta.annotation-2.0
 -bundles=com.ibm.ws.jaxrs.defaultexceptionmapper, \
-         io.openliberty.opentracing.3.0.internal, \
-         io.openliberty.opentracing.3.0.internal.cdi, \
+		 com.ibm.ws.jaxrs.2.x.defaultexceptionmapper, \
+         io.openliberty.opentracing.3.0.internal.jakarta, \
+         io.openliberty.opentracing.3.0.internal.cdi.jakarta, \
          io.openliberty.io.opentracing.opentracing-util.0.33.0, \
          io.openliberty.opentracing.3.0.thirdparty; location:="dev/api/third-party/,lib/"; mavenCoordinates="io.opentracing:opentracing-api:0.33.0", \
          com.ibm.ws.microprofile.opentracing.jaeger, \

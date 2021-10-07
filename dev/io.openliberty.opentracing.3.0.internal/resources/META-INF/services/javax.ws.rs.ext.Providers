@@ -1,0 +1,2 @@
+io.openliberty.opentracing.3.0.internal.OpentracingClientFilter
+io.openliberty.opentracing.3.0.internal.OpentracingContainerFilter

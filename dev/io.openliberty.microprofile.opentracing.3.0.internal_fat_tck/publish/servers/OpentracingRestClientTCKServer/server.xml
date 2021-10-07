@@ -6,12 +6,12 @@
 <server>
     <featureManager>
         <feature>componenttest-1.0</feature>
-        <feature>webProfile-8.0</feature>
+        <feature>timedexit-1.0</feature>
         <feature>localConnector-1.0</feature>
         <feature>mpOpenTracing-3.0</feature>
         <feature>usr:opentracingMock-3.0</feature>
         <feature>mpRestClient-2.0</feature>
-        <feature>arquillian-support-1.0</feature>
+    
     </featureManager>
 
     <include location="../fatTestPorts.xml" />

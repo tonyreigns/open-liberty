@@ -15,7 +15,7 @@ IBM-API-Package: \
   io.openliberty.jakarta.cdi-3.0, \
   io.openliberty.jakarta.annotation-2.0
 -bundles=\
-    io.openliberty.microprofile.opentracing.3.0.internal
+    io.openliberty.microprofile.opentracing.3.0.internal.jakarta; apiJar=false; location:="lib/"
 kind=ga
 edition=core
 WLP-Activation-Type: parallel

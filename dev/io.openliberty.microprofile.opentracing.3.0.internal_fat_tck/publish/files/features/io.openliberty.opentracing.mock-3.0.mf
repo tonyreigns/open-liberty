@@ -1,4 +1,4 @@
-IBM-Feature-Version: 3
+IBM-Feature-Version: 2
 IBM-ShortName: opentracingMock-3.0
 Subsystem-License: https://www.eclipse.org/legal/epl-v10.html
 Subsystem-ManifestVersion: 1

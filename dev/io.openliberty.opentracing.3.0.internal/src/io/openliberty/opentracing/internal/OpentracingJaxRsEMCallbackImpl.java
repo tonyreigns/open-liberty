@@ -16,7 +16,6 @@ import java.util.Map;
 import javax.ws.rs.container.ResourceInfo;
 
 import com.ibm.ws.jaxrs.defaultexceptionmapper.DefaultExceptionMapperCallback;
-
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
 

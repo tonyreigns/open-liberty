@@ -16,6 +16,8 @@ Bundle-Name: io.openliberty.microprofile.opentracing.3.0.internal.rest.client
 Bundle-SymbolicName: io.openliberty.microprofile.opentracing.3.0.internal.rest.client
 Bundle-Description: MicroProfile.OpenTracing integration with MicroProfile REST Client, version 3.0
 
+jakartaeeMe: true
+
 WS-TraceGroup: OPENTRACING
 
 Import-Package: \
@@ -41,7 +43,6 @@ Service-Component: \
 -buildpath: \
     io.openliberty.opentracing.3.0.internal;version=latest, \
     com.ibm.websphere.javaee.jaxrs.2.0;version=latest, \
-    com.ibm.ws.jaxrs.2.0.common;version=latest, \
     com.ibm.ws.logging;version=latest, \
     io.openliberty.org.eclipse.microprofile.opentracing.3.0;version=latest, \
     com.ibm.websphere.org.eclipse.microprofile.rest.client.1.4;version=latest

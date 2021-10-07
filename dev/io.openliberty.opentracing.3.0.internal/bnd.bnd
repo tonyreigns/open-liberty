@@ -34,6 +34,7 @@ Import-Package: \
     io.opentracing.util;version=0.33.0,\
     io.opentracing.noop;version=0.33.0,\
     org.eclipse.microprofile.config.*;version="[1.0,4)",\
+    com.ibm.ws.jaxrs.defaultexceptionmapper;resolution:=optional,\
     *
 
 Export-Package: \
@@ -42,6 +43,9 @@ Export-Package: \
 	io.openliberty.opentracing.spi.tracer;version=3.0;provide=true
                 
 Private-Package: io.openliberty.opentracing.internal.resources
+
+app-resources= \
+  META-INF/services/javax.ws.rs.ext.Providers
 
 -buildpath: \
     com.ibm.websphere.javaee.jaxrs.2.1;version=latest, \

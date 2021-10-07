@@ -26,7 +26,7 @@ tested.features: mpOpenTracing-3.0
 -buildpath: \
     io.openliberty.org.eclipse.microprofile.opentracing.3.0;version=latest,\
     io.openliberty.opentracing.3.0.internal;version=latest,\
-    com.ibm.websphere.javaee.jaxrs.2.1;version=latest,\
+    
     com.ibm.websphere.javaee.cdi.2.0;version=latest,\
     com.ibm.websphere.javaee.jsonp.1.1;version=latest,\
     io.openliberty.io.opentracing.opentracing-api.0.33.0;version=latest,\
