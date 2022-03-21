@@ -80,6 +80,7 @@ public class FFDCJanitor implements Callable<Void> {
     @Override
     public Void call() throws Exception {
         FFDCConfigurator.getDelegate().rollLogs();
+        //Add ffdc log date check?
         reschedule();
         return null;
     }
