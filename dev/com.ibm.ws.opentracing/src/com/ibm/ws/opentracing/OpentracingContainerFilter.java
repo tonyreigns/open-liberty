@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017, 2022 IBM Corporation and others.
+ * Copyright (c) 2017, 2020 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,8 +56,6 @@ public class OpentracingContainerFilter implements ContainerRequestFilter, Conta
     protected ResourceInfo resourceInfo;
 
     private OpentracingFilterHelper helper;
-
-    private boolean spanErrorLogged = false;
 
     OpentracingContainerFilter(OpentracingFilterHelper helper) {
         setFilterHelper(helper);
@@ -124,20 +122,13 @@ public class OpentracingContainerFilter implements ContainerRequestFilter, Conta
             spanBuilder.withTag(Tags.HTTP_METHOD.getKey(), incomingRequestContext.getMethod());
             spanBuilder.asChildOf(priorOutgoingContext);
 
-            try {
-                ActiveSpan activeSpan = spanBuilder.startActive();
+            ActiveSpan activeSpan = spanBuilder.startActive();
 
-                if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
-                    Tr.debug(tc, methodName + " activeSpan", activeSpan);
-                }
-
-                incomingRequestContext.setProperty(SERVER_SPAN_PROP_ID, activeSpan);
-            } catch (NoSuchMethodError e) {
-                if (!spanErrorLogged) {
-                    Tr.error(tc, "OPENTRACING_COULD_NOT_START_SPAN", e);
-                    spanErrorLogged = true;
-                }
+            if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
+                Tr.debug(tc, methodName + " activeSpan", activeSpan);
             }
+
+            incomingRequestContext.setProperty(SERVER_SPAN_PROP_ID, activeSpan);
         }
 
         incomingRequestContext.setProperty(SERVER_SPAN_SKIPPED_ID, !process);

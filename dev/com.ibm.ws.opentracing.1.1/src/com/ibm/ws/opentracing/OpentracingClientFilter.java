@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017, 2022 IBM Corporation and others.
+ * Copyright (c) 2017, 2018 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -62,8 +62,6 @@ public class OpentracingClientFilter implements ClientRequestFilter, ClientRespo
     private static final AutoFinishScopeManager AUTO_FINISH_SCOPE_MANAGER = new AutoFinishScopeManager();
 
     private OpentracingFilterHelper helper;
-
-    private boolean spanErrorLogged = false;
 
     OpentracingClientFilter(OpentracingFilterHelper helper) {
         setFilterHelper(helper);
@@ -131,26 +129,19 @@ public class OpentracingClientFilter implements ClientRequestFilter, ClientRespo
                 spanBuilder.ignoreActiveSpan().asChildOf(parentSpanContext);
             }
 
-            try{
-                Span span = spanBuilder.start();
-                if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
-                    Tr.debug(tc, methodName + " span", span);
-                }
+            Span span = spanBuilder.start();
+            if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
+                Tr.debug(tc, methodName + " span", span);
+            }
 
-                try (AutoFinishScope scope = AUTO_FINISH_SCOPE_MANAGER.activate(span, true)) {
-                    Continuation continuation = scope.capture();
+            try (AutoFinishScope scope = AUTO_FINISH_SCOPE_MANAGER.activate(span, true)) {
+                Continuation continuation = scope.capture();
 
-                    tracer.inject(
-                                  scope.span().context(),
-                                  Format.Builtin.HTTP_HEADERS, new MultivaluedMapToTextMap(clientRequestContext.getHeaders()));
+                tracer.inject(
+                              scope.span().context(),
+                              Format.Builtin.HTTP_HEADERS, new MultivaluedMapToTextMap(clientRequestContext.getHeaders()));
 
-                    clientRequestContext.setProperty(CLIENT_CONTINUATION_PROP_ID, continuation);
-                }
-            } catch (NoSuchMethodError e){
-                if (!spanErrorLogged) {
-                    Tr.error(tc, "OPENTRACING_COULD_NOT_START_SPAN", e);
-                    spanErrorLogged = true;
-                }
+                clientRequestContext.setProperty(CLIENT_CONTINUATION_PROP_ID, continuation);
             }
         } else {
             Span currentSpan = tracer.activeSpan();
