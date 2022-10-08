@@ -17,6 +17,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.ibm.ws.ffdc.FFDCConfigurator;
+import com.ibm.ws.logging.internal.impl.BaseFFDCService;
 
 /**
  * This is a very simple service: it uses the ScheduledExecutorService registred
@@ -77,10 +78,12 @@ public class FFDCJanitor implements Callable<Void> {
      * Trigger an FFDC log roll using the FFDCConfigurator.
      * Reschedule the task to trip again...
      */
-    @Override
+    @SuppressWarnings("restriction")
+	@Override
     public Void call() throws Exception {
         FFDCConfigurator.getDelegate().rollLogs();
-        //Add ffdc log date check?
+        BaseFFDCService ffdcService = new BaseFFDCService();
+        ffdcService.cleanFFDCLogs();
         reschedule();
         return null;
     }

@@ -12,14 +12,18 @@ package com.ibm.ws.logging.internal.impl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -413,6 +417,81 @@ public class BaseFFDCService implements FFDCFilterService {
 
         logSummary(incidentCopies);
     }
+
+    public void cleanFFDCLogs() {
+        // final String txt = th + " " + key.sourceId + " " + key.probeId;
+        //  Tr.info(tc, "lwas.FFDCIncidentEmitted", txt, newFile.getName());
+        Tr.info(tc, "lwas.FFDCIncidentEmitted", "ROLL LOGS!!!");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        //  Date d1 = sdf.parse(sdf.format("03/21/2022"));
+
+        File[] postExceptionFiles = getFfdcLogs();
+        Tr.info(tc, "lwas.FFDCIncidentEmitted", "FFDC NUMBER OF FILES: " + postExceptionFiles.length);
+
+//            try {
+//                Date d3 = sdf.parse(sdf.format("03/21/2022"));
+//                Tr.info(tc, "lwas.FFDCIncidentEmitted", "OLD FFDC FILES! Compare: " + d3 + " --- " + sdf.parse(sdf.format(postExceptionFiles[0].lastModified())),
+//                        newFile.getName());
+//            } catch (ParseException e1) {
+//                Tr.info(tc, "lwas.FFDCIncidentEmitted", "OLD FFDC FILES! BROKEN: " + e1.getStackTrace(), newFile.getName());
+//                // TODO Auto-generated catch block
+//                // Do you need FFDC here? Remember FFDC instrumentation and @FFDCIgnore
+//
+//            }
+        for (int i = 0; i < postExceptionFiles.length; i++) {
+
+//                Tr.info(tc, "lwas.FFDCIncidentEmitted", "FFDC File names: " + postExceptionFiles[i].lastModified(), newFile.getName());
+
+            // Tr.info(tc, "lwas.FFDCIncidentEmitted", "FFDC File names: " + sdf.format(postExceptionFiles[i].lastModified()), newFile.getName());
+
+            try {
+                Date d1 = new Date();
+                Date d2 = sdf.parse(sdf.format(postExceptionFiles[i].lastModified()));
+
+                if (d1.before(d2)) {
+                    Tr.info(tc, "lwas.FFDCIncidentEmitted", "OLD FFDC FILES! DELETE: " + sdf.format(postExceptionFiles[i].lastModified()));
+                    postExceptionFiles[i].delete();
+
+                }
+
+//                    else
+//                        Tr.info(tc, "lwas.FFDCIncidentEmitted", "OLD FFDC FILES! DELETE2: " + d1 + " -- " + sdf.format(postExceptionFiles[i].lastModified()),
+//                                newFile.getName());
+            } catch (ParseException e) {
+//                    // TODO Auto-generated catch block
+//                    // Do you need FFDC here? Remember FFDC instrumentation and @FFDCIgnore
+//                    e.printStackTrace();
+                Tr.info(tc, "lwas.FFDCIncidentEmitted", "OLD FFDC FILES! BROKEN: " + e.getStackTrace());
+            }
+
+        }
+
+        // FFDCConfigurator.getDelegate().rollLogs();
+
+    }
+
+    private File[] getFfdcLogs() {
+        Tr.info(tc, "lwas.FFDCIncidentEmitted", "OLD FFDC FILES! BROKEN: wdwdwd");
+        File target = FFDCConfigurator.getFFDCLocation();
+        if (target.exists()) {
+            File[] ffdcFiles = target.listFiles(ffdcLogFilter);
+            return ffdcFiles;
+        } else {
+            System.out.println("The ffdc directory did not exist: " + target.getAbsolutePath());
+        }
+
+        // If the folder didn't exist just return an empty array
+        return new File[0];
+    }
+
+    static FilenameFilter ffdcLogFilter = new FilenameFilter() {
+
+        @Override
+        public boolean accept(File dir, String name) {
+            return name.startsWith("ffdc_") && name.endsWith(".log");
+        }
+    };
 
     synchronized File createNewSummaryFile() {
         File newFile;
