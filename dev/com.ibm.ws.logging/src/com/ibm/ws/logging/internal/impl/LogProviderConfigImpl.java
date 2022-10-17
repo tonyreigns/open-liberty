@@ -138,6 +138,9 @@ public class LogProviderConfigImpl implements LogProviderConfig {
     /** The rollover interval for time based log rollover */
     protected volatile long rolloverInterval = -1;
 
+    /** The maximum FFDC file age */
+    protected volatile long maxFfdcAge = -1;
+
     private final boolean checkpoint;
 
     private volatile boolean restore = false;
@@ -228,6 +231,9 @@ public class LogProviderConfigImpl implements LogProviderConfig {
         rolloverInterval = LoggingConfigUtils.getLongDurationValue(LoggingConfigUtils.getEnvValue(LoggingConstants.ENV_WLP_LOGGING_ROLLOVER_INTERVAL), rolloverInterval,
                                                                    TimeUnit.MINUTES);
 
+        maxFfdcAge = LoggingConfigUtils.getLongDurationValue(LoggingConfigUtils.getEnvValue(LoggingConstants.ENV_WLP_LOGGING_MAX_FFDC_AGE), maxFfdcAge,
+                                                                   TimeUnit.MINUTES);
+
         stackTraceSingleEntry = LoggingConfigUtils.getBooleanValue(LoggingConfigUtils.getEnvValue(LoggingConstants.ENV_WLP_LOGGING_STACK_TRACE_SINGLE_ENTRY),
                                                                    stackTraceSingleEntry);
     }
@@ -288,6 +294,8 @@ public class LogProviderConfigImpl implements LogProviderConfig {
 
         rolloverStartTime = InitConfgAttribute.ROLLOVER_START_TIME.getStringValueAndSaveInit(c, rolloverStartTime, isInit);
         rolloverInterval = InitConfgAttribute.ROLLOVER_INTERVAL.getLongDurationValueAndSaveInit(c, rolloverInterval, isInit, TimeUnit.MINUTES);
+
+        maxFfdcAge = InitConfgAttribute.MAX_FFDC_AGE.getLongDurationValueAndSaveInit(c, maxFfdcAge, isInit, TimeUnit.MINUTES);
 
         stackTraceSingleEntry = InitConfgAttribute.STACK_JOIN_CONFIGURATION.getBooleanValueAndSaveInit(c, stackTraceSingleEntry, isInit);
     }
@@ -492,6 +500,9 @@ public class LogProviderConfigImpl implements LogProviderConfig {
         return rolloverInterval;
     }
 
+    public long getMaxFfdcAge() {
+        return maxFfdcAge;
+    }
     /**
      * @return true if we should use the logger -> tr handler
      */
@@ -555,6 +566,7 @@ public class LogProviderConfigImpl implements LogProviderConfig {
         APPS_WRITE_JSON("appsWriteJson", "com.ibm.ws.logging.apps.write.json"),
         ROLLOVER_START_TIME("rolloverStartTime", "com.ibm.ws.logging.rollover.start.time"),
         ROLLOVER_INTERVAL("rolloverInterval", "com.ibm.ws.logging.rollover.interval"),
+        MAX_FFDC_AGE("maxFfdcAge", "com.ibm.ws.logging.max.ffdc.age"),
         NEW_LOGS_ON_START("newLogsOnStart", FileLogHolder.NEW_LOGS_ON_START_PROPERTY);
 
         final String configKey;
