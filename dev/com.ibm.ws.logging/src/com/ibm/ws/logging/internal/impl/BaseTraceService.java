@@ -1443,6 +1443,8 @@ public class BaseTraceService implements TrService {
      */
     private void scheduleFfdcFileDeletion(LogProviderConfigImpl config) {
         long maxFfdcAge = config.getMaxFfdcAge();
+        Boolean startNow = config.getFfdcCleanupStartNow();
+
         if (this.isFfdcCleanupScheduled) {
             //Return if the ffdcMaxAge attribute doesn't change. Otherwise, cancel the schedule.
             if (this.maxFfdcAge == maxFfdcAge) {
@@ -1467,15 +1469,22 @@ public class BaseTraceService implements TrService {
 
         //set calendar start time
         Calendar sched = Calendar.getInstance();
-        sched.set(Calendar.HOUR_OF_DAY, 0);
-        sched.set(Calendar.MINUTE, 0);
-        sched.add(Calendar.DATE, 1);
+
+        if(!startNow) {
+            sched.set(Calendar.HOUR_OF_DAY, 0);
+            sched.set(Calendar.MINUTE, 0);
+            sched.add(Calendar.DATE, 1);                //The cleanup will run everyday at midnight.
+        }
+        else {
+            sched.add(Calendar.SECOND, 1);      //Used for test cases in order to trigger the cleanup event immediately.
+        }
+
         Date firstFfdcCleanup = sched.getTime();
 
         //schedule rollover
         ffdcCleanup_Timer = new Timer(true);
         TimedFfdcCleanup tlr = new TimedFfdcCleanup(maxFfdcAge);
-        ffdcCleanup_Timer.scheduleAtFixedRate(tlr, firstFfdcCleanup, 2 * 60000);
+        ffdcCleanup_Timer.scheduleAtFixedRate(tlr, firstFfdcCleanup, 24 * 60 * 60000);
         this.isFfdcCleanupScheduled = true;
     }
 
@@ -2209,8 +2218,6 @@ public class BaseTraceService implements TrService {
         if (target.exists()) {
             File[] ffdcFiles = target.listFiles(ffdcLogFilter);
             return ffdcFiles;
-        } else {
-            Tr.info(tc, "lwas.FFDCIncidentEmitted", "The ffdc directory did not exist: " + target.getAbsolutePath());
         }
 
         // If the folder didn't exist just return an empty array

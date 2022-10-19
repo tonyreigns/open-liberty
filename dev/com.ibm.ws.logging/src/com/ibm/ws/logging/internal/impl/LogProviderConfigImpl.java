@@ -141,6 +141,9 @@ public class LogProviderConfigImpl implements LogProviderConfig {
     /** The maximum FFDC file age */
     protected volatile long maxFfdcAge = -1;
 
+    /** Boolean to start log cleanup immediately. For internal test use only. */
+    protected volatile boolean ffdcCleanupStartNow = false;
+
     private final boolean checkpoint;
 
     private volatile boolean restore = false;
@@ -296,6 +299,7 @@ public class LogProviderConfigImpl implements LogProviderConfig {
         rolloverInterval = InitConfgAttribute.ROLLOVER_INTERVAL.getLongDurationValueAndSaveInit(c, rolloverInterval, isInit, TimeUnit.MINUTES);
 
         maxFfdcAge = InitConfgAttribute.MAX_FFDC_AGE.getLongDurationValueAndSaveInit(c, maxFfdcAge, isInit, TimeUnit.MINUTES);
+        ffdcCleanupStartNow = InitConfgAttribute.FFDC_CLEANUP_START_NOW.getBooleanValue(c, ffdcCleanupStartNow, isInit);
 
         stackTraceSingleEntry = InitConfgAttribute.STACK_JOIN_CONFIGURATION.getBooleanValueAndSaveInit(c, stackTraceSingleEntry, isInit);
     }
@@ -503,6 +507,10 @@ public class LogProviderConfigImpl implements LogProviderConfig {
     public long getMaxFfdcAge() {
         return maxFfdcAge;
     }
+
+    public boolean getFfdcCleanupStartNow() {
+        return ffdcCleanupStartNow;
+    }
     /**
      * @return true if we should use the logger -> tr handler
      */
@@ -567,6 +575,7 @@ public class LogProviderConfigImpl implements LogProviderConfig {
         ROLLOVER_START_TIME("rolloverStartTime", "com.ibm.ws.logging.rollover.start.time"),
         ROLLOVER_INTERVAL("rolloverInterval", "com.ibm.ws.logging.rollover.interval"),
         MAX_FFDC_AGE("maxFfdcAge", "com.ibm.ws.logging.max.ffdc.age"),
+        FFDC_CLEANUP_START_NOW("ffdcCleanupStartNow", "com.ibm.ws.logging.ffdc.cleanup.start.now"),
         NEW_LOGS_ON_START("newLogsOnStart", FileLogHolder.NEW_LOGS_ON_START_PROPERTY);
 
         final String configKey;
