@@ -2195,9 +2195,8 @@ public class BaseTraceService implements TrService {
             int deletedCounter = 0;
             for (int i = 0; i < postExceptionFiles.length; i++) {
                 try {
-                    Date now = new Date();
                     Date fileLastModifiedDate = sdf.parse(sdf.format(postExceptionFiles[i].lastModified()));
-                    long fileAge = TimeUnit.MINUTES.convert(now.getTime() - fileLastModifiedDate.getTime(),TimeUnit.MILLISECONDS);
+                    long fileAge = TimeUnit.MINUTES.convert(System.currentTimeMillis() - fileLastModifiedDate.getTime(),TimeUnit.MILLISECONDS);
 
                     if (fileAge > maxFfdcAge) {
                         postExceptionFiles[i].delete();
