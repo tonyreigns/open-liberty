@@ -145,7 +145,7 @@
         </AD>
 
         <AD name="internal" description="internal use only" 
-            id="ffdcCleanupStartNow" required="false" type="Boolean" default="false" ibm:beta="true">
+            id="ffdcCleanupStartDelay" required="false" type="Integer" default="-1" ibm:beta="true">
         </AD>
     </OCD>
   

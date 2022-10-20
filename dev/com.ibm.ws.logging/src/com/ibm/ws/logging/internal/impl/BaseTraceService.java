@@ -1443,7 +1443,7 @@ public class BaseTraceService implements TrService {
      */
     private void scheduleFfdcFileDeletion(LogProviderConfigImpl config) {
         long maxFfdcAge = config.getMaxFfdcAge();
-        Boolean startNow = config.getFfdcCleanupStartNow();
+        int startDelay = config.getFfdcCleanupStartDelay();
 
         if (this.isFfdcCleanupScheduled) {
             //Return if the ffdcMaxAge attribute doesn't change. Otherwise, cancel the schedule.
@@ -1470,13 +1470,13 @@ public class BaseTraceService implements TrService {
         //set calendar start time
         Calendar sched = Calendar.getInstance();
 
-        if(!startNow) {
+        if(startDelay < 0) {
             sched.set(Calendar.HOUR_OF_DAY, 0);
             sched.set(Calendar.MINUTE, 0);
             sched.add(Calendar.DATE, 1);                //The cleanup will run everyday at midnight.
         }
         else {
-            sched.add(Calendar.SECOND, 1);      //Used for test cases in order to trigger the cleanup event immediately.
+            sched.add(Calendar.SECOND, startDelay);      //Used for test cases in order to trigger the cleanup event after the configured delay.
         }
 
         Date firstFfdcCleanup = sched.getTime();
