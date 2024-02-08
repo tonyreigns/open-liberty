@@ -12,8 +12,6 @@
  *******************************************************************************/
 package io.openliberty.microprofile.metrics.internal.monitor.computed.internal;
 
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -415,9 +413,9 @@ public class ComputedMonitorMetricsHandler {
 
     public void calculateMetricValue() {
         MetricRegistry mr;
-        Double metricVal = null, diffDuration = null, diffTotalCount = null;
 
         for (Map.Entry<MetricID, Set<ComputedMonitorMetrics>> entry : computationMetricsMap.entrySet()) {
+            Double metricVal = null, diffDuration = null, diffTotalCount = null;
             MetricID computedMetricID = entry.getKey();
             Set<ComputedMonitorMetrics> monitorMetrics = entry.getValue();
 
@@ -434,12 +432,6 @@ public class ComputedMonitorMetricsHandler {
                 // Do not need to use the EWMA for the cpu utilization calculation
                 // Can get it directly from com.ibm.ws.kernel.service.util.CpuInfo.getJavaCpuUsage()
                 calculateProcessCpuUsage(computedMetricID);
-            } else if (computedMetricName.equals("gc.time.per.cycle")) {
-                // Need to retrieve the gc.time and gc.total from the GarbageCollectionMXBean directly,
-                // instead of the mpMetrics-5.x API, since there is a known bug, where the gc.time from
-                // the mpMetrics-5.x API returns as a Counter, which drops the decimal in the returned float value,
-                // making the value not useful for computation.
-                calculateEWMAValueForGC(computedMetricID, monitorMetrics);
             } else {
                 for (ComputedMonitorMetrics cmm : monitorMetrics) {
                     mr = getMetricRegistry(cmm.getMonitorMetricScope());
@@ -447,9 +439,9 @@ public class ComputedMonitorMetricsHandler {
                     metricVal = getMetricValue(mr, cmm);
                     if (metricVal != null) {
                         if (cmm.getComputationType().equals(Constants.DURATION)) {
-                            diffDuration = cmm.getDifference(metricVal.doubleValue());
+                            diffDuration = cmm.getDifference(metricVal);
                         } else if (cmm.getComputationType().equals(Constants.TOTAL)) {
-                            diffTotalCount = cmm.getDifference(metricVal.doubleValue());
+                            diffTotalCount = cmm.getDifference(metricVal);
                         }
                     }
                 }
@@ -460,37 +452,6 @@ public class ComputedMonitorMetricsHandler {
             }
         }
     }
-    
-    public void calculateEWMAValueForGC(MetricID computedMetricID, Set<ComputedMonitorMetrics> monitorMetrics) {
-        double currValue = 0.0, diffDuration = 0.0, diffTotalCount = 0.0;
-        
-        // Get the collection of Garbage Collection MXBeans
-        List<GarbageCollectorMXBean> gcMXBeansList = ManagementFactory.getGarbageCollectorMXBeans();
-        
-        for (GarbageCollectorMXBean gcMXBean : gcMXBeansList) {
-            for (ComputedMonitorMetrics cmm : monitorMetrics) {
-                String gcName = gcMXBean.getName();
-                String gcMetricsName = cmm.getMonitorMetricID().getTags().get("name");
-                if (gcName.equals(gcMetricsName)) {
-                    if (cmm.getComputationType().equals(Constants.DURATION)) {
-                        currValue = gcMXBean.getCollectionTime() * Constants.MILLISECONDCONVERSION;
-                        if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
-                            Tr.debug(tc, "GarbageCollectionTime for + " + computedMetricID + " = " + currValue);
-                        }
-                        diffDuration = currValue < 0 ? -1.0 : cmm.getDifference(currValue);
-                    } else if (cmm.getComputationType().equals(Constants.TOTAL)) {
-                        currValue = gcMXBean.getCollectionCount();
-                        if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
-                            Tr.debug(tc, "GarbageCollectionCount for + " + computedMetricID + " = " + currValue);
-                        }
-                        diffTotalCount = currValue < 0 ? -1.0 : cmm.getDifference(currValue);
-                    }
-                }
-            }
-            calculateEWMAValue(computedMetricID, diffDuration, diffTotalCount);
-        }
-    }
-
 
     public void calculateHeapUsage(MetricID computedMetricID, Set<ComputedMonitorMetrics> monitorMetrics) {
         double usedHeap = 0.0, maxHeap = 0.0, heapUsage = 0.0;
@@ -546,8 +507,12 @@ public class ComputedMonitorMetricsHandler {
             if (cmm.getComputationType().equals(Constants.DURATION)) {
                 Duration currentDur = currentTimer.getElapsedTime();
                 if (currentDur != null)  {
-                    metricNum = currentDur.getNano();
-                    currentValue = (metricNum.doubleValue()) * Constants.NANOSECONDCONVERSION; // to seconds.
+                    // Get total elapsed time in nanoseconds from Duration API.
+                    double tempDurNanos = (double) currentDur.toNanos();
+                    if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
+                        Tr.debug(tc, "REST Timer ElapsedTime Duration in nanoseconds = " + tempDurNanos);
+                    }
+                    currentValue = tempDurNanos * Constants.NANOSECONDCONVERSION; // convert to secs
                 }
             } else {
                 // Get Total Counter Value for Timer
@@ -570,9 +535,6 @@ public class ComputedMonitorMetricsHandler {
 
     public void calculateEWMAValue(MetricID computedMetricID, double duration, double totalCount) {
         double computedVal = 0.0;
-        
-        // Only the computed metricIDs that require EWMA will be passed into this method.
-        EWMA ewmaObj = (EWMA) finalComputedMetricsMap.get(computedMetricID);
 
         // Calculate the new computed metric.
         // If the duration or the totalCount is a negative value, set the computedValue to be -1.0
@@ -580,11 +542,20 @@ public class ComputedMonitorMetricsHandler {
         // the JVM. The rest of the metrics needed for computation are monotonically increasing,
         // and will never result in a negative value.
         computedVal = ((duration < 0.0) || (totalCount < 0.0)) ? -1.0 : (duration / totalCount);
+        if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
+            Tr.debug(tc, "The computed value is " + computedVal);
+        }
         
-        if (computedVal == -1.0) {
+        String computedMetricName = computedMetricID.getName();
+        if (computedMetricName.equals("gc.time.per.cycle") && computedVal == -1.0) {
+            if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
+                Tr.debug(tc, "The GC Time was unknown to the JVM, hence updating map for GCTime computed metric to -1.");
+            }
             finalComputedMetricsMap.put(computedMetricID, computedVal);
         }
         else {
+            // Only the computed metricIDs that require EWMA will be passed into this method.
+            EWMA ewmaObj = (EWMA) finalComputedMetricsMap.get(computedMetricID);
             if (ewmaObj == null) {
                 // Initialization of the EWMA object, for the first time.
                 if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
@@ -597,8 +568,8 @@ public class ComputedMonitorMetricsHandler {
                 double initialValue = (duration == 0.0 || totalCount == 0.0) ? 0.0 : computedVal;
                 ewmaObj.updateNewValue(initialValue);
             } else {
-                if ((duration == 0.0 || totalCount == 0.0)) {
-                    // If nothing changed during the current sampling period, get the previously calculated EWMA value and feed it into it again.
+                if (duration == 0.0 || totalCount == 0.0 || computedVal < 0.0) {
+                    // If nothing changed during the current sampling period, or if the computed value is negative, get the previously calculated EWMA value and feed it into it again.
                     if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
                         Tr.debug(tc, "Idling - There were no new data in the sampling period, getting the previously calculated EWMA value to feed into it again.");
                     }

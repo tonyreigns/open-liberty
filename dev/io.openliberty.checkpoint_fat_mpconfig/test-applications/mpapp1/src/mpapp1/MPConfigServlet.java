@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2022 IBM Corporation and others.
+ * Copyright (c) 2022, 2023 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -52,8 +52,8 @@ public class MPConfigServlet extends FATServlet {
     }
 
     @Test
-    public void envValueChangeTest() {
-        reqScopeBean.envValueChangeTest();
+    public void providerEnvValueTest() {
+        reqScopeBean.providerEnvValueTest();
     }
 
     @Test
@@ -67,6 +67,11 @@ public class MPConfigServlet extends FATServlet {
     }
 
     @Test
+    public void varDirValueTest() {
+        reqScopeBean.varDirValueTest();
+    }
+
+    @Test
     public void noDefaultEnvValueTest() {
         reqScopeBean.noDefaultEnvValueTest();
     }
@@ -74,11 +79,6 @@ public class MPConfigServlet extends FATServlet {
     @Test
     public void noDefaultServerValueTest() {
         reqScopeBean.noDefaultServerValueTest();
-    }
-
-    @Test
-    public void providerEnvValueChangeTest() {
-        reqScopeBean.providerEnvValueChangeTest();
     }
 
     // MPconfigBeanWithApplicationScope
@@ -93,8 +93,8 @@ public class MPConfigServlet extends FATServlet {
     }
 
     @Test
-    public void appScopeEnvValueChangeTest() {
-        appScopeBean.appScopeEnvValueChangeTest();
+    public void appScopeProviderEnvValueTest() {
+        appScopeBean.appScopeProviderEnvValueTest();
     }
 
     @Test
@@ -108,6 +108,11 @@ public class MPConfigServlet extends FATServlet {
     }
 
     @Test
+    public void appScopeVarDirValueTest() {
+        appScopeBean.varDirValueTest();
+    }
+
+    @Test
     public void appScopeNoDefaultEnvValueTest() {
         appScopeBean.appScopeNoDefaultEnvValueTest();
     }
@@ -115,11 +120,6 @@ public class MPConfigServlet extends FATServlet {
     @Test
     public void appScopeNoDefaultServerValueTest() {
         appScopeBean.appScopeNoDefaultServerValueTest();
-    }
-
-    @Test
-    public void appScopeProviderEnvValueChangeTest() {
-        appScopeBean.appScopeProviderEnvValueChangeTest();
     }
 
     // ApplicationScopedOnCheckpointBeanWithConfigObject
@@ -131,11 +131,6 @@ public class MPConfigServlet extends FATServlet {
     @Test
     public void configObjectAppScopeEnvValueTest() {
         appScopeOnCheckpointWithConfigObject.appScopeEnvValueTest();
-    }
-
-    @Test
-    public void configObjectAppScopeEnvValueChangeTest() {
-        appScopeOnCheckpointWithConfigObject.appScopeEnvValueChangeTest();
     }
 
     @Test
@@ -160,18 +155,33 @@ public class MPConfigServlet extends FATServlet {
     }
 
     @Test
-    public void configObjectPropertiesAppScopeEnvValueChangeTest() {
-        appScopeOnCheckpointWithConfigObjectProperties.appScopeEnvValueChangeTest();
-    }
-
-    @Test
     public void configObjectPropertiesAppScopeServerValueTest() {
         appScopeOnCheckpointWithConfigObjectProperties.appScopeServerValueTest();
     }
 
     // ApplicationScopedOnCheckpointBean
     @Test
-    public void applicationScopedValueTest() {
-        appScopeOnCheckpointBean.applicationScopedValueTest();
+    public void appScopeEarlyAccessValueTest() {
+        appScopeOnCheckpointBean.appScopedValueTest();
+    }
+
+    @Test
+    public void appScopeEarlyAccessNoDefaultEnvValueTest() {
+        appScopeOnCheckpointBean.appScopeEarlyAccessNoDefaultEnvValueTest();
+    }
+
+    @Test
+    public void appScopeEarlyAccessNoDefaultServerValueTest() {
+        appScopeOnCheckpointBean.appScopeEarlyAccessNoDefaultServerValueTest();
+    }
+
+    @Test
+    public void appScopeEarlyAccessNoDefaultProviderEnvValueTest() {
+        appScopeOnCheckpointBean.appScopeEarlyAccessNoDefaultProviderEnvValueTest();
+    }
+
+    @Test
+    public void appScopeEarlyAccessNoDefaultProviderServerValueTest() {
+        appScopeOnCheckpointBean.appScopeEarlyAccessNoDefaultProviderServerValueTest();
     }
 }

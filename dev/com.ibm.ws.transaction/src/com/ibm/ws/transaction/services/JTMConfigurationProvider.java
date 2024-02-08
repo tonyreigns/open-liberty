@@ -42,7 +42,6 @@ import com.ibm.websphere.ras.annotation.Trivial;
 import com.ibm.ws.Transaction.JTA.Util;
 import com.ibm.ws.kernel.launch.service.ForcedServerStop;
 import com.ibm.wsspi.kernel.service.location.WsLocationAdmin;
-import com.ibm.wsspi.kernel.service.location.WsLocationConstants;
 import com.ibm.wsspi.kernel.service.location.WsResource;
 import com.ibm.wsspi.kernel.service.utils.AtomicServiceReference;
 import com.ibm.wsspi.kernel.service.utils.ConcurrentServiceReferenceSet;
@@ -359,6 +358,7 @@ public class JTMConfigurationProvider extends DefaultConfigurationProvider imple
      * Use Tr configuration for 'transaction' group.
      */
     @Override
+    @Trivial
     public Level getTraceLevel() {
         return tc.getLoggerLevel();
     }
@@ -376,6 +376,7 @@ public class JTMConfigurationProvider extends DefaultConfigurationProvider imple
     }
 
     @Override
+    @Trivial
     public String getLeaseCheckStrategy() {
         return (String) _props.get("leaseCheckStrategy");
     }
@@ -387,20 +388,30 @@ public class JTMConfigurationProvider extends DefaultConfigurationProvider imple
     }
 
     @Override
+    @Trivial
     public int getLeaseCheckInterval() {
         Number num = (Number) _props.get("leaseCheckInterval");
         return num.intValue();
     }
 
     @Override
+    @Trivial
     public int getLeaseLength() {
         Number num = (Number) _props.get("leaseLength");
         return num.intValue();
     }
 
     @Override
+    @Trivial
     public int getLeaseRenewalThreshold() {
         Number num = (Number) _props.get("leaseRenewalThreshold");
+        return num.intValue();
+    }
+
+    @Override
+    @Trivial
+    public int getLeaseExpiryThreshold() {
+        Number num = (Number) _props.get("leaseExpiryThreshold");
         return num.intValue();
     }
 
@@ -485,29 +496,8 @@ public class JTMConfigurationProvider extends DefaultConfigurationProvider imple
                     Tr.debug(tc, "Disable recoverOnStartup during restore until config updates complete");
                 return false;
             }
-        } else {
-            if (checkpoint() && isDefaultRecoveryLog()) {
-                // Optimize restore for default recovery log. Perform initial
-                // local recovery during checkpoint and preserve logs through restore.
-                if (tc.isDebugEnabled())
-                    Tr.debug(tc, "Enable recoverOnStartup during checkpoint for default recovery log");
-                return true;
-            }
         }
         return isRoS;
-    }
-
-    /**
-     * @return true iff the configured transactionLogDirectory is the default path.
-     */
-    private boolean isDefaultRecoveryLog() {
-        String txLogDirProp = (String) _props.get("transactionLogDirectory");
-        try {
-            String defaultLogDir = locationService.resolveString(WsLocationConstants.SYMBOL_SERVER_OUTPUT_DIR) + "tranlog";
-            return defaultLogDir.equals(txLogDirProp);
-        } catch (Exception ex) {
-            return false;
-        }
     }
 
     @Override
@@ -552,8 +542,6 @@ public class JTMConfigurationProvider extends DefaultConfigurationProvider imple
 
     @Override
     public ResourceFactory getResourceFactory() {
-
-//WAS THIS        _theDataSourceFactory = dataSourceFactoryRef.getService();
         try {
             _theDataSourceFactory = dataSourceFactoryRef.getServiceWithException();
         } catch (Exception ex) {
@@ -595,7 +583,6 @@ public class JTMConfigurationProvider extends DefaultConfigurationProvider imple
     @Override
     @Trivial
     public String getRecoveryGroup() {
-
         _recoveryGroup = (String) _props.get("recoveryGroup");
         if (tc.isDebugEnabled())
             Tr.debug(tc, "getRecoveryGroup {0}", _recoveryGroup);
@@ -635,7 +622,7 @@ public class JTMConfigurationProvider extends DefaultConfigurationProvider imple
                 ServiceReference<ResourceFactory> serviceRef = dataSourceFactoryRef.getReference();
                 if (tc.isDebugEnabled())
                     Tr.debug(tc, "retrieved datasourceFactory service ref " + serviceRef);
-                if (isStartupEnabled()) {
+                if (isStartupEnabled() && serviceRef != null) {
                     tmsRef.doStartup(this, _isSQLRecoveryLog);
                 }
             }
@@ -878,8 +865,11 @@ public class JTMConfigurationProvider extends DefaultConfigurationProvider imple
      * @see com.ibm.tx.config.ConfigurationProvider#getTimeBetweenHeartbeats()
      */
     @Override
+    @Trivial
     public int getTimeBetweenHeartbeats() {
         Number num = (Number) _props.get("timeBetweenHeartbeats");
+        if (tc.isDebugEnabled())
+            Tr.debug(tc, "getTimeBetweenHeartbeats: {0}", num);
         return num.intValue();
     }
 
@@ -889,8 +879,11 @@ public class JTMConfigurationProvider extends DefaultConfigurationProvider imple
      * @see com.ibm.tx.config.ConfigurationProvider#getPeerTimeBeforeStale()
      */
     @Override
+    @Trivial
     public int getPeerTimeBeforeStale() {
         Number num = (Number) _props.get("peerTimeBeforeStale");
+        if (tc.isDebugEnabled())
+            Tr.debug(tc, "getPeerTimeBeforeStale: {0}", num);
         return num.intValue();
     }
 
@@ -900,8 +893,11 @@ public class JTMConfigurationProvider extends DefaultConfigurationProvider imple
      * @see com.ibm.tx.config.ConfigurationProvider#getLightweightLogRetryInterval()
      */
     @Override
+    @Trivial
     public int getLightweightLogRetryInterval() {
         Number num = (Number) _props.get("lightweightLogRetryInterval");
+        if (tc.isDebugEnabled())
+            Tr.debug(tc, "getLightweightLogRetryInterval: {0}", num);
         return num.intValue();
     }
 
@@ -911,8 +907,11 @@ public class JTMConfigurationProvider extends DefaultConfigurationProvider imple
      * @see com.ibm.tx.config.ConfigurationProvider#getLightweightLogRetryLimit()
      */
     @Override
+    @Trivial
     public int getLightweightLogRetryLimit() {
         Number num = (Number) _props.get("lightweightLogRetryLimit");
+        if (tc.isDebugEnabled())
+            Tr.debug(tc, "getLightweightLogRetryLimit: {0}", num);
         return num.intValue();
     }
 
@@ -922,8 +921,11 @@ public class JTMConfigurationProvider extends DefaultConfigurationProvider imple
      * @see com.ibm.tx.config.ConfigurationProvider#getLogRetryInterval()
      */
     @Override
+    @Trivial
     public int getLogRetryInterval() {
         Number num = (Number) _props.get("logRetryInterval");
+        if (tc.isDebugEnabled())
+            Tr.debug(tc, "getLogRetryInterval: {0}", num);
         return num.intValue();
     }
 
@@ -933,8 +935,11 @@ public class JTMConfigurationProvider extends DefaultConfigurationProvider imple
      * @see com.ibm.tx.config.ConfigurationProvider#getLogRetryLimit()
      */
     @Override
+    @Trivial
     public int getLogRetryLimit() {
         Number num = (Number) _props.get("logRetryLimit");
+        if (tc.isDebugEnabled())
+            Tr.debug(tc, "getLogRetryLimit: {0}", num);
         return num.intValue();
     }
 
@@ -1071,5 +1076,15 @@ public class JTMConfigurationProvider extends DefaultConfigurationProvider imple
             success |= fileToRemove.delete();
         }
         return success;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see com.ibm.tx.config.ConfigurationProvider#enableHADBPeerLocking()
+     */
+    @Override
+    public boolean peerRecoveryPrecedence() {
+        return (Boolean) _props.get("peerRecoveryPrecedence");
     }
 }

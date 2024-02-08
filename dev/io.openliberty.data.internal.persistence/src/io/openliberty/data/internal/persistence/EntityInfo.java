@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022,2023 IBM Corporation and others.
+ * Copyright (c) 2022,2024 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,12 @@
  *******************************************************************************/
 package io.openliberty.data.internal.persistence;
 
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.RecordComponent;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -21,13 +26,13 @@ import java.util.SortedMap;
 import java.util.concurrent.CompletableFuture;
 
 import com.ibm.websphere.ras.annotation.Trivial;
-import com.ibm.wsspi.persistence.PersistenceServiceUnit;
 
 import jakarta.data.Sort;
 import jakarta.data.exceptions.MappingException;
 import jakarta.persistence.Inheritance;
 
 /**
+ * Entity information
  */
 class EntityInfo {
     // properly cased/qualified JPQL attribute name --> accessor methods or fields (multiple in the case of embeddable)
@@ -39,6 +44,8 @@ class EntityInfo {
     // properly cased/qualified JPQL attribute name --> type
     final SortedMap<String, Class<?>> attributeTypes;
 
+    final EntityManagerBuilder builder;
+
     // properly cased/qualified JPQL attribute name --> type of collection
     final Map<String, Class<?>> collectionElementTypes;
 
@@ -47,7 +54,6 @@ class EntityInfo {
     final SortedMap<String, Member> idClassAttributeAccessors; // null if no IdClass
     final boolean inheritance;
     final String name;
-    final PersistenceServiceUnit persister;
     final Class<?> recordClass; // null if not a record
     final String versionAttributeName; // null if unversioned
 
@@ -67,8 +73,9 @@ class EntityInfo {
                Class<?> idType,
                SortedMap<String, Member> idClassAttributeAccessors,
                String versionAttributeName,
-               PersistenceServiceUnit persister) {
+               EntityManagerBuilder entityManagerBuilder) {
         this.name = entityName;
+        this.builder = entityManagerBuilder;
         this.entityClass = entityClass;
         this.attributeAccessors = attributeAccessors;
         this.attributeNames = attributeNames;
@@ -77,11 +84,38 @@ class EntityInfo {
         this.relationAttributeNames = relationAttributeNames;
         this.idType = idType;
         this.idClassAttributeAccessors = idClassAttributeAccessors;
-        this.persister = persister;
         this.recordClass = recordClass;
         this.versionAttributeName = versionAttributeName;
 
         inheritance = entityClass.getAnnotation(Inheritance.class) != null;
+    }
+
+    /**
+     * Obtains the value of an entity attribute.
+     *
+     * @param entity        the entity from which to obtain the value.
+     * @param attributeName name of the entity attribute.
+     * @return the value of the attribute.
+     */
+    Object getAttribute(Object entity, String attributeName) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        List<Member> accessors = attributeAccessors.get(attributeName);
+        if (accessors == null)
+            throw new IllegalArgumentException(attributeName); // should never occur
+
+        Object value = entity;
+        for (Member accessor : accessors) {
+            Class<?> type = accessor.getDeclaringClass();
+            if (type.isInstance(value)) {
+                if (accessor instanceof Method)
+                    value = ((Method) accessor).invoke(value);
+                else // Field
+                    value = ((Field) accessor).get(value);
+            } else {
+                throw new MappingException("Value of type " + value.getClass().getName() + " is incompatible with attribute type " + type.getName()); // TODO NLS
+            }
+        }
+
+        return value;
     }
 
     String getAttributeName(String name, boolean failIfNotFound) {
@@ -170,7 +204,7 @@ class EntityInfo {
      * @return a Sort instance with the corresponding entity attribute name.
      */
     @Trivial
-    Sort getWithAttributeName(String name, Sort sort) {
+    <T> Sort<T> getWithAttributeName(String name, Sort<T> sort) {
         name = getAttributeName(name, true);
         if (name == sort.property())
             return sort;
@@ -190,6 +224,29 @@ class EntityInfo {
     static CompletableFuture<EntityInfo> newFuture(Class<?> entityClass) {
         // It's okay to use Java SE's CompletableFuture here given that *Async methods are never invoked on it
         return new CompletableFuture<>();
+    }
+
+    /**
+     * Converts a generated entity back to its record equivalent.
+     *
+     * @param entity generated entity.
+     * @return record.
+     * @throws Exception if an error occurs.
+     */
+    @Trivial
+    final Object toRecord(Object entity) throws Exception {
+        // TODO replace this method by including a toRecord method on an interface that is implemented
+        // by the generated entity, then cast to the interface and invoke it to get the record.
+        RecordComponent[] components = recordClass.getRecordComponents();
+        Class<?>[] argTypes = new Class<?>[components.length];
+        Object[] args = new Object[components.length];
+        int a = 0;
+        for (RecordComponent component : components) {
+            PropertyDescriptor desc = new PropertyDescriptor(component.getName(), entity.getClass());
+            argTypes[a] = component.getType();
+            args[a++] = desc.getReadMethod().invoke(entity);
+        }
+        return recordClass.getConstructor(argTypes).newInstance(args);
     }
 
     @Override

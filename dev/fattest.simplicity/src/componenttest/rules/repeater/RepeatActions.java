@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2023 IBM Corporation and others.
+ * Copyright (c) 2020, 2024 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ package componenttest.rules.repeater;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,7 +87,7 @@ public class RepeatActions {
                                      FeatureSet firstFeatureSet,
                                      List<FeatureSet> otherFeatureSets) {
         // if server is null use an empty array, else return an array with the server as the sole element
-        String[] servers = server != null ? new String[] {server}: new String[] {};
+        String[] servers = server != null ? new String[] { server } : new String[] {};
         return repeat(servers, otherFeatureSetsTestMode, allFeatureSets, firstFeatureSet, otherFeatureSets);
     }
 

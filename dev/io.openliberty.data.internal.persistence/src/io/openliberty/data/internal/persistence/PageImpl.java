@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2022,2023 IBM Corporation and others.
+ * Copyright (c) 2022,2024 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -35,13 +35,13 @@ public class PageImpl<T> implements Page<T> {
     private static final TraceComponent tc = Tr.register(PageImpl.class);
 
     private final Object[] args;
-    private final Pageable pagination;
+    private final Pageable<T> pagination;
     private final QueryInfo queryInfo;
     private final List<T> results;
     private long totalElements = -1;
 
     @FFDCIgnore(Exception.class)
-    PageImpl(QueryInfo queryInfo, Pageable pagination, Object[] args) {
+    PageImpl(QueryInfo queryInfo, Pageable<T> pagination, Object[] args) {
         this.queryInfo = queryInfo;
         this.pagination = pagination == null ? Pageable.ofSize(100) : pagination;
         this.args = args;
@@ -52,7 +52,7 @@ public class PageImpl<T> implements Page<T> {
             && Pageable.class.equals(queryInfo.method.getParameterTypes()[0]))
             throw new NullPointerException("Pageable: null");
 
-        EntityManager em = queryInfo.entityInfo.persister.createEntityManager();
+        EntityManager em = queryInfo.entityInfo.builder.createEntityManager();
         try {
             @SuppressWarnings("unchecked")
             TypedQuery<T> query = (TypedQuery<T>) em.createQuery(queryInfo.jpql, queryInfo.entityInfo.entityClass);
@@ -80,7 +80,7 @@ public class PageImpl<T> implements Page<T> {
         if (pagination.page() == 1L && results.size() <= pagination.size() && pagination.size() < Integer.MAX_VALUE)
             return results.size();
 
-        EntityManager em = queryInfo.entityInfo.persister.createEntityManager();
+        EntityManager em = queryInfo.entityInfo.builder.createEntityManager();
         try {
             if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled())
                 Tr.debug(this, tc, "query for count: " + queryInfo.jpqlCount);
@@ -115,7 +115,7 @@ public class PageImpl<T> implements Page<T> {
     }
 
     @Override
-    public Pageable pageable() {
+    public Pageable<T> pageable() {
         return pagination;
     }
 
@@ -146,11 +146,17 @@ public class PageImpl<T> implements Page<T> {
     }
 
     @Override
-    public Pageable nextPageable() {
+    public Pageable<T> nextPageable() {
         if (results.size() <= pagination.size() && pagination.size() < Integer.MAX_VALUE)
             return null;
 
         return pagination.next();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <E> Pageable<E> nextPageable(Class<E> entityClass) {
+        return (Pageable<E>) nextPageable();
     }
 
     @Override

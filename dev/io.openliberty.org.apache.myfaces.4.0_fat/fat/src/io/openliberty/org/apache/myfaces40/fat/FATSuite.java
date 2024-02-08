@@ -12,12 +12,14 @@ package io.openliberty.org.apache.myfaces40.fat;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.ibm.websphere.simplicity.log.Log;
+import com.ibm.ws.fat.util.FatLogHandler;
 
 import componenttest.custom.junit.runner.FATRunner;
 import componenttest.rules.repeater.RepeatTests;
@@ -41,6 +43,7 @@ import io.openliberty.org.apache.myfaces40.fat.tests.SelectItemTests;
 import io.openliberty.org.apache.myfaces40.fat.tests.SubscribeToEventTest;
 import io.openliberty.org.apache.myfaces40.fat.tests.UIViewRootGetDoctypeTest;
 import io.openliberty.org.apache.myfaces40.fat.tests.WebSocketTests;
+import io.openliberty.org.apache.myfaces40.fat.tests.bugfixes.MyFaces4628Test;
 
 @RunWith(Suite.class)
 @SuiteClasses({
@@ -63,7 +66,9 @@ import io.openliberty.org.apache.myfaces40.fat.tests.WebSocketTests;
                 UIViewRootGetDoctypeTest.class,
                 Faces40URNTest.class,
                 WebSocketTests.class,
-                Html5Tests.class
+                Html5Tests.class,
+                MyFaces4628Test.class
+
 })
 
 public class FATSuite {
@@ -96,6 +101,14 @@ public class FATSuite {
         } catch (Exception e) {
             //ignore only using for debugging
         }
+    }
+
+    /**
+     * @see {@link FatLogHandler#generateHelpFile()}
+     */
+    @BeforeClass
+    public static void generateHelpFile() {
+        FatLogHandler.generateHelpFile();
     }
 
 }

@@ -14,6 +14,10 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import componenttest.annotation.MinimumJavaLevel;
+import componenttest.custom.junit.runner.RepeatTestFilter;
+import componenttest.rules.repeater.MicroProfileActions;
+import componenttest.rules.repeater.RepeatTests;
+import io.openliberty.microprofile.telemetry.internal_fat.shared.TelemetryActions;
 
 @RunWith(Suite.class)
 @MinimumJavaLevel(javaLevel = 11)
@@ -21,7 +25,9 @@ import componenttest.annotation.MinimumJavaLevel;
                 ClientWithNoCdi.class,
                 JaxRsIntegration.class,
                 JaxRsIntegrationWithConcurrency.class,
+                ReactiveMessageThatTriggersClientTest.class,
                 Telemetry10.class,
+                TelemetryAloneTest.class,
                 TelemetryBeanTest.class,
                 TelemetryMultiAppTest.class,
                 TelemetrySpiTest.class,
@@ -42,6 +48,19 @@ import componenttest.annotation.MinimumJavaLevel;
                 TelemetryServletTest.class,
                 TelemetryWithSpanErrorTest.class
 })
-
 public class FATSuite {
+
+    public static RepeatTests allMPRepeats(String serverName) {
+        return TelemetryActions
+                        .repeat(serverName, MicroProfileActions.MP61, TelemetryActions.MP14_MPTEL11, TelemetryActions.MP41_MPTEL11, TelemetryActions.MP50_MPTEL11,
+                                MicroProfileActions.MP60);
+    }
+
+    public static String getTelemetryVersionUnderTest() {
+        if (RepeatTestFilter.isRepeatActionActive(MicroProfileActions.MP60_ID)) {
+            return "1.0";
+        } else {
+            return "1.1";
+        }
+    }
 }

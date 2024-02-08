@@ -45,7 +45,7 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import jakarta.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class InMemorySpanExporter implements SpanExporter {
@@ -286,7 +286,7 @@ public class InMemorySpanExporter implements SpanExporter {
             String unclaimedNames = unclaimedSpans.stream()
                             .map(SpanData::getName)
                             .collect(Collectors.joining(", "));
-            LOGGER.severe("TEST9999E: Found unexpected spans at shutdown, full data in log: " + unclaimedNames);
+            LOGGER.severe("TEST9999E: Found " + unclaimedSpans.size() + " unexpected spans at shutdown, full data in log: " + unclaimedNames);
             for (SpanData span : unclaimedSpans) {
                 LOGGER.severe(span.toString());
             }
