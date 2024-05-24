@@ -148,7 +148,7 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
                                                               .build().getOpenTelemetrySdk();
                 });
 
-                System.out.println("Server OpenTelemetry Instance: " + openTelemetry.toString());
+                //System.out.println("Server OpenTelemetry Instance: " + openTelemetry.toString());
                 if (openTelemetry != null) {
                     return new EnabledOpenTelemetryInfo(true, openTelemetry, appName);
                 }
@@ -193,7 +193,7 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
                                                               .build().getOpenTelemetrySdk();
                 });
 
-                System.out.println("Application OpenTelemetry Instance: " + appName + " -- " + openTelemetry.toString());
+                //System.out.println("Application OpenTelemetry Instance: " + appName + " -- " + openTelemetry.toString());
                 if (openTelemetry != null) {
                     return new EnabledOpenTelemetryInfo(true, openTelemetry, appName);
                 }

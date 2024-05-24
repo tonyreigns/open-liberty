@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -228,7 +228,13 @@ public abstract class Collector implements Handler, Formatter {
             tagList = validList.toArray(new String[validList.size()]);
         }
 
-        int maxFieldLength = (Integer) config.get(MAX_FIELD_KEY);
+        int maxFieldLength;
+        if (config.get(MAX_FIELD_KEY) != null) {
+            maxFieldLength = (Integer) config.get(MAX_FIELD_KEY);
+        } else {
+            maxFieldLength = 2048;
+        }
+
         int maxEvents = 0;
         //Events Throttling - maxEvents
         if (config.containsKey(MAX_EVENTS_KEY)) {
