@@ -41,7 +41,6 @@ Import-Package: \
 	com.ibm.websphere.ras,\
 	com.ibm.websphere.ras.annotation,\
 	io.openliberty.microprofile.telemetry.internal.common.resources
-
 Export-Package: \
   io.opentelemetry.extension.trace.propagation;version=${openTelemetryVersion};thread-context=true,\
   io.opentelemetry.exporter.otlp.internal;version=${openTelemetryVersion};thread-context=true,\
