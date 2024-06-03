@@ -29,6 +29,6 @@ public interface OpenTelemetryInfoFactory {
     /**
      * @return
      */
-    OpenTelemetryInfo getServerOpenTelemetryInfo(ClassLoader newClassLoader);
+    OpenTelemetryInfo getOpenTelemetryInfo(String appName);
 
 }
