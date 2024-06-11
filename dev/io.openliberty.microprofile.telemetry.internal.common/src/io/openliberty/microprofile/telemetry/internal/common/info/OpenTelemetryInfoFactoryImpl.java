@@ -17,6 +17,7 @@ import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 
 import org.apache.commons.lang3.concurrent.LazyInitializer;
 import org.eclipse.microprofile.config.Config;
@@ -43,7 +44,6 @@ import io.openliberty.microprofile.telemetry.internal.interfaces.OpenTelemetryIn
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdkBuilder;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;
@@ -147,10 +147,8 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
             //Builds tracer provider if user has enabled tracing aspects with config properties
             if (!checkDisabled(telemetryProperties)) {
                 OpenTelemetry openTelemetry = AccessController.doPrivileged((PrivilegedAction<OpenTelemetry>) () -> {
-                    return openTelemetryVersionedConfiguration.getPartiallyConfiguredOpenTelemetrySDKBuilder().addPropertiesCustomizer(x -> telemetryProperties) //Overrides OpenTelemetry's property order
-                                                              .addResourceCustomizer(OpenTelemetryInfoFactoryImpl::customizeResource) //Defaults service name to application name
-                                                              .setServiceClassLoader(classLoader)
-                                                              .build().getOpenTelemetrySdk();
+                    return openTelemetryVersionedConfiguration.buildOpenTelemetry(telemetryProperties,
+                                                                                  OpenTelemetryInfoFactoryImpl::customizeResource, classLoader);
                 });
 
                 otelMap.put(otelInstanceName, openTelemetry);
@@ -190,10 +188,8 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
             if (!checkDisabled(telemetryProperties)) {
 
                 OpenTelemetry openTelemetry = AccessController.doPrivileged((PrivilegedAction<OpenTelemetry>) () -> {
-                    return openTelemetryVersionedConfiguration.getPartiallyConfiguredOpenTelemetrySDKBuilder().addPropertiesCustomizer(x -> telemetryProperties) //Overrides OpenTelemetry's property order
-                                                              .addResourceCustomizer(OpenTelemetryInfoFactoryImpl::customizeResource) //Defaults service name to application nam
-                                                              .setServiceClassLoader(Thread.currentThread().getContextClassLoader())
-                                                              .build().getOpenTelemetrySdk();
+                    return openTelemetryVersionedConfiguration.buildOpenTelemetry(telemetryProperties,
+                                                                                  OpenTelemetryInfoFactoryImpl::customizeResource, Thread.currentThread().getContextClassLoader());
                 });
 
                 otelMap.put(appName, openTelemetry);
@@ -254,8 +250,6 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
                 }
             }
 
-            telemetryProperties.putAll(openTelemetryVersionedConfiguration.getTelemetryPropertyDefaults());
-
             return telemetryProperties;
         } catch (Exception e) {
             Tr.error(tc, Tr.formatMessage(tc, "CWMOT5002.telemetry.error", e));
@@ -275,8 +269,6 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
                           .ifPresent(value -> telemetryProperties.put(normalizedName, value));
                 }
             }
-
-            telemetryProperties.putAll(openTelemetryVersionedConfiguration.getTelemetryPropertyDefaults());
 
             return telemetryProperties;
         } catch (Exception e) {
@@ -351,10 +343,8 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
     //Interfaces and private classes only relevent to this factory.
 
     public interface OpenTelemetryVersionedConfiguration {
-        public AutoConfiguredOpenTelemetrySdkBuilder getPartiallyConfiguredOpenTelemetrySDKBuilder();
-
-        public Map<String, String> getTelemetryPropertyDefaults();
-
+        OpenTelemetry buildOpenTelemetry(Map<String, String> openTelemetryProperties, BiFunction<? super Resource, ConfigProperties, ? extends Resource> resourceCustomiser,
+                                         ClassLoader classLoader);
     }
 
     /*
