@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -29,6 +29,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
+import com.ibm.websphere.logging.hpel.LogRecordContext;
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
 import com.ibm.ws.collector.manager.buffer.BufferManagerImpl;
@@ -94,6 +95,16 @@ public class CollectorManagerImpl implements CollectorManager {
      * When a source is bound, handle all pending subscriptions for the source.
      */
     public synchronized void setSource(Source source) {
+
+        Map<String, String> map = new HashMap<>();
+
+        LogRecordContext.getExtensions(map);
+
+        for (String key : map.keySet()) {
+            if (!key.equals("thread"))
+                System.out.println("LOGRECORDCONTEXT(collectorManager)! ------------------ " + key + " -- " + map.get(key));
+        }
+
         String sourceId = CollectorManagerUtils.getSourceId(source);
         SourceManager srcMgr = null;
         if (!sourceMgrs.containsKey(sourceId)) {
@@ -399,6 +410,15 @@ public class CollectorManagerImpl implements CollectorManager {
 
         //Add BufferManager into a Map. This will be retrieved later to be passed onto a SourceManager so that it can associate a Handler to it.
         bufferManagerMap.put(sourceId, bufferMgr);
+
+        Map<String, String> map = new HashMap<>();
+
+        LogRecordContext.getExtensions(map);
+
+        for (String key : map.keySet()) {
+            if (!key.equals("thread"))
+                System.out.println("LOGRECORDCONTEXT(collectorManager2)! ------------------ " + key + " -- " + map.get(key));
+        }
 
         //Create the BufferManager Service and store the ServiceRegistration into a Map so that the service can be unregistered later.
         if (bundleContext == null) {

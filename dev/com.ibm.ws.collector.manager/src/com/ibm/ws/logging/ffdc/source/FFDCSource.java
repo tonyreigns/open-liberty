@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -21,6 +21,7 @@ import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
 import com.ibm.ws.ffdc.FFDC;
 import com.ibm.ws.logging.data.FFDCData;
+import com.ibm.ws.threadContext.ComponentMetaDataAccessorImpl;
 import com.ibm.wsspi.collector.manager.BufferManager;
 import com.ibm.wsspi.collector.manager.Source;
 import com.ibm.wsspi.logging.Incident;
@@ -46,6 +47,13 @@ public class FFDCSource implements Source {
         if (TraceComponent.isAnyTracingEnabled() && tc.isEventEnabled()) {
             Tr.event(tc, "Activating " + this);
         }
+        System.out.println("ACTIVATING FFDC!");
+//        try {
+//            String appName = ComponentMetaDataAccessorImpl.getComponentMetaDataAccessor().getComponentMetaData().getJ2EEName().getApplication();
+//            System.out.println("FFDC APP NAME: " + appName);
+//        } catch (Exception e) {
+//            System.out.println("NO APP NAME FOUND!");
+//        }
     }
 
     protected void deactivate(int reason) {
@@ -73,6 +81,7 @@ public class FFDCSource implements Source {
             Tr.event(tc, "Setting buffer manager " + this);
         }
         this.bufferMgr = bufferMgr;
+        System.out.println("IN FFDC BUFFER!");
         startSource();
     }
 
@@ -91,6 +100,8 @@ public class FFDCSource implements Source {
      *
      */
     private void startSource() {
+        System.out.println("IN FFDC source!");
+
         incidentHandler = new IncidentHandler();
         FFDC.registerIncidentForwarder(incidentHandler);
     }
@@ -117,6 +128,14 @@ public class FFDCSource implements Source {
             //to the bufferMgr multiple times
             //TODO: Need to evaluate the need for the timeStamp (timeStamp == dateOfFirstOccurrence) check is required or not
             if (countVal == 1) {
+                System.out.println("IN FFDC process!");
+
+                try {
+                    String appName = ComponentMetaDataAccessorImpl.getComponentMetaDataAccessor().getComponentMetaData().getJ2EEName().getApplication();
+                    System.out.println("FFDC APP NAME(2): " + appName);
+                } catch (Exception e) {
+                    System.out.println("NO APP NAME FOUND!");
+                }
 
                 FFDCData ffdcData = new FFDCData();
 
@@ -129,6 +148,8 @@ public class FFDCSource implements Source {
                 ffdcData.setThreadId(in.getThreadId());
                 ffdcData.setStacktrace(getStackTraceAsString(th));
                 ffdcData.setObjectDetails(getCallerDetails(in));
+
+                System.out.println("IN FFDC process2!");
 
                 String sequenceVal = timeStampVal + "_" + String.format("%013X", seq.incrementAndGet());
                 ffdcData.setSequence(sequenceVal);
@@ -159,6 +180,8 @@ public class FFDCSource implements Source {
         }
 
         private String getStackTraceAsString(Throwable th) {
+            System.out.println("IN FFDC stack trace!");
+
             StringWriter strBuf = new StringWriter();
             PrintWriter writer = new PrintWriter(strBuf);
             th.printStackTrace(writer);

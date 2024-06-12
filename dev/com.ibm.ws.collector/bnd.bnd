@@ -33,6 +33,7 @@ Import-Package: \
         com.ibm.ws.logging.collector, \
         com.ibm.ws.logging.utils, \
         com.ibm.ws.logging.synch, \
+        com.ibm.websphere.logging.hpel, \
         javax.net.ssl;resolution:=optional, \
         com.ibm.websphere.ssl;resolution:=optional, \
         com.ibm.wsspi.ssl;resolution:=optional
@@ -51,6 +52,7 @@ Private-Package: com.ibm.ws.collector.internal*
 	com.ibm.websphere.appserver.spi.kernel.service;version=latest,\
 	com.ibm.ws.collector.manager;version=latest,\
 	com.ibm.ws.logging;version=latest,\
+	com.ibm.ws.logging.core;version=latest,\
 	com.ibm.ws.org.osgi.annotation.versioning;version=latest
 
 -testpath: \

@@ -77,6 +77,11 @@ import io.opentelemetry.api.logs.LogRecordBuilder;
 import io.opentelemetry.api.logs.Severity;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.semconv.SemanticAttributes;
+import com.ibm.ws.threadContext.ComponentMetaDataAccessorImpl;
+import com.ibm.ws.runtime.metadata.ApplicationMetaData;
+import com.ibm.ws.runtime.metadata.ComponentMetaData;
+import com.ibm.ws.runtime.metadata.MetaDataSlot;
+
 
 @Component(name = OpenTelemetryHandler.COMPONENT_NAME, service = {
 		Handler.class }, configurationPolicy = ConfigurationPolicy.OPTIONAL, property = { "service.vendor=IBM" })
@@ -89,6 +94,8 @@ public class OpenTelemetryHandler extends Collector {
 
 	private OpenTelemetry openTelemetry = null;
 	private int counter = 0;
+
+	private OpenTelemetry serverOtel;
 
 	@Override
 	@Reference(name = EXECUTOR_SERVICE, service = ExecutorService.class)
@@ -108,6 +115,7 @@ public class OpenTelemetryHandler extends Collector {
 		
 	
 		 System.out.println("Getting OTEL SERVER: " + OpenTelemetryAccessor.getOpenTelemetryInfo("SERVER").getOpenTelemetry());
+		 this.serverOtel = OpenTelemetryAccessor.getOpenTelemetryInfo("SERVER").getOpenTelemetry();
 
         super.activate(cc, configuration);
         
@@ -154,8 +162,31 @@ public class OpenTelemetryHandler extends Collector {
 		 String eventType = CollectorJsonUtils.getEventType(source, location);
 		    if (eventType.equals(CollectorConstants.MESSAGES_LOG_EVENT_TYPE)) {
 		        LogTraceData logData = (LogTraceData) event;
+		        //System.out.println("Logdata: " + logData.getMessage());
 		        if (logData.getMessage().contains("scopeInfo:")) {
 		            return null;
+		        }
+		        
+		       // System.out.println("Class loader: " + logData.getClassLoader());
+		        
+		        
+//		        
+//		        class
+//		        
+		        try {
+		        	
+		        	Thread.currentThread().setContextClassLoader(logData.getClassLoader());
+		        	
+		        	 //String appName = ComponentMetaDataAccessorImpl.getComponentMetaDataAccessor().getComponentMetaData().getJ2EEName().getApplication();
+		        	 ComponentMetaData metaData = ComponentMetaDataAccessorImpl.getComponentMetaDataAccessor().getComponentMetaData();
+		        	 if(metaData != null) {
+		        		 String appName = metaData.getJ2EEName().getApplication();
+		        		 System.out.println("App found: " + appName);
+		        	 }
+		        	 
+		        }
+		        catch(Exception e) {
+		        	
 		        }
 		        
 			    AttributesBuilder attributes = Attributes.builder();
@@ -185,7 +216,7 @@ public class OpenTelemetryHandler extends Collector {
 		                    	String appName = k.getStringValue();
 		                    	if(!appName.contains("io.openliberty") && !appName.contains("com.ibm.ws")) {
 		                    		otelInstance = OpenTelemetryAccessor.getOpenTelemetryInfo(appName).getOpenTelemetry();
-		                    		System.out.println("Getting app instance! " + appName  + " -- " + otelInstance); 
+		                    		//System.out.println("Getting app instance! " + appName  + " -- " + otelInstance); 
 		                    	}
 		                    }
 		                }
@@ -193,12 +224,16 @@ public class OpenTelemetryHandler extends Collector {
 		        }
 		        
 		        if(otelInstance == null) {
-            		otelInstance = OpenTelemetryAccessor.getOpenTelemetryInfo("SERVER").getOpenTelemetry();
+            		//otelInstance = OpenTelemetryAccessor.getOpenTelemetryInfo("SERVER").getOpenTelemetry();
+		        	otelInstance = this.serverOtel;
 		        }
 		        
+		        if(otelInstance == null)
+		        	System.out.println("OTEL INSTANCE IS STILL NULL!");
+		        	
 		        LogRecordBuilder builder = otelInstance.getLogsBridge().loggerBuilder(OpenTelemetryConstants.INSTRUMENTATION_NAME).build().logRecordBuilder();
 		        mapLogRecord(builder, logData, eventType, attributes);
-		        builder.emit();
+		       // builder.emit();
 		    }
 		
 		return null;

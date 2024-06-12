@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -124,6 +124,9 @@ public class LogSource implements Source {
 
     public LogTraceData parse(RoutedMessage routedMessage, LogRecord logRecord) {
 
+        //  System.out.println("Current thread context classLoader: " + Thread.currentThread().getContextClassLoader());
+
+//        ThreadContext<ComponentMetaData> threadContext = new ThreadContextImpl<ComponentMetaData>();
         LogTraceData logData = new LogTraceData();
 
         long dateVal = logRecord.getMillis();
@@ -135,6 +138,7 @@ public class LogSource implements Source {
 
         int threadIdVal = (int) Thread.currentThread().getId();
         logData.setThreadId(threadIdVal);
+        logData.setClassLoader(Thread.currentThread().getContextClassLoader());
         logData.setModule(logRecord.getLoggerName());
         logData.setSeverity(LogFormatUtils.mapLevelToType(logRecord));
         logData.setLoglevel(LogFormatUtils.mapLevelToRawType(logRecord));

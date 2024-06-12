@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -158,6 +158,8 @@ public class LogTraceData extends GenericData {
     // Both regular JSON logging fields and LogstashCollector field names
     private static NameAliases[] nameAliasesMessages = { jsonLoggingNameAliasesMessages, logstashNameAliasesMessages };
     private static NameAliases[] nameAliasesTrace = { jsonLoggingNameAliasesTrace, logstashNameAliasesTrace };
+
+    private ClassLoader classLoader;
 
     public static void newJsonLoggingNameAliasesMessage(Map<String, String> newAliases) {
         jsonLoggingNameAliasesMessages.newAliases(newAliases);
@@ -387,6 +389,14 @@ public class LogTraceData extends GenericData {
 
     public long getRawSequenceNumber(long l) {
         return rawSequenceNumber;
+    }
+
+    public void setClassLoader(ClassLoader contextClassLoader) {
+        this.classLoader = contextClassLoader;
+    }
+
+    public ClassLoader getClassLoader() {
+        return classLoader;
     }
 
     /**
