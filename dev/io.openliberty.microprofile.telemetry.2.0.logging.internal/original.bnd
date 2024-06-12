@@ -23,5 +23,5 @@ Private-Package: \
 	com.ibm.ws.collector*
 	
 -dsannotations: \
-        io.openliberty.microprofile.telemetry20.logging.internal.OpenTelemetryHandler	
+        io.openliberty.microprofile.telemetry20.logging.internal.OpenTelemetryLogHandler	
 
