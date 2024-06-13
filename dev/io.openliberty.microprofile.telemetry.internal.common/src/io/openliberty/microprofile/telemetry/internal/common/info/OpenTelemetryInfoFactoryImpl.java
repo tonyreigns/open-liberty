@@ -132,7 +132,7 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
 
     public OpenTelemetryInfo createServerOpenTelemetryInfo() {
         try {
-            String otelInstanceName = "SERVER";
+            String otelInstanceName = "RUNTIME";
 
             if (AgentDetection.isAgentActive()) {
                 // If we're using the agent, it will have set GlobalOpenTelemetry and we must use its instance

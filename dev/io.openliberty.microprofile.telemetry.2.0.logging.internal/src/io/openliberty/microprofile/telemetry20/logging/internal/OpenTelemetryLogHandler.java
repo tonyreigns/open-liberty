@@ -81,7 +81,7 @@ public class OpenTelemetryLogHandler extends Collector implements ServerQuiesceL
 	    if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
 	    	    Tr.debug(tc, "In activate()");
 	    }
-	    this.openTelemetry = getOpenTelemetry();
+	    this.openTelemetry = OpenTelemetryAccessor.getOpenTelemetryInfo("RUNTIME").getOpenTelemetry();
 	    // Configure message as the only source.
 	    Map<String, Object> config = setSourceListToConfig(configuration);
 	    super.activate(cc, config);
@@ -245,15 +245,6 @@ public class OpenTelemetryLogHandler extends Collector implements ServerQuiesceL
 	        tle = new TelemetryLogEmitter();
 	    }
 	    return tle;
-	}
-	
-	public OpenTelemetry getOpenTelemetry() {
-	    OpenTelemetry openTelemetry = null;
-	    ClassLoader newClassLoader = OpenTelemetry.noop().getClass().getClassLoader();     
-         
-	    OpenTelemetryInfo openTelemetryInfo = OpenTelemetryAccessor.getServerOpenTelemetryInfo(newClassLoader);
-	    openTelemetry = openTelemetryInfo.getOpenTelemetry();
-	    return openTelemetry;
 	}
 	
 	private Map<String, Object> setSourceListToConfig(Map<String, Object> configuration) {
