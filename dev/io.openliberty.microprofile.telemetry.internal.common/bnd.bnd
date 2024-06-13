@@ -71,6 +71,8 @@ Import-Package: \
 	com.ibm.ws.org.osgi.annotation.versioning;version=latest,\
 	com.ibm.wsspi.org.osgi.service.component.annotations;version=latest,\
 	io.openliberty.io.opentelemetry;version=latest,\
-	io.openliberty.org.jboss.resteasy.common;version=latest
+	io.openliberty.org.jboss.resteasy.common;version=latest,\
+	io.opentelemetry.semconv:opentelemetry-semconv;version='1.25.0.alpha';strategy=exact
+	
 
 WS-TraceGroup: TELEMETRY
