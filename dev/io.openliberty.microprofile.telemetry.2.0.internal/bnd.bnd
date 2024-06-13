@@ -53,6 +53,8 @@ Import-Package: \
 	org.eclipse.microprofile.rest.client; version="[1.0.0,3.0.0)",\
 	org.eclipse.microprofile.rest.client.spi; version="[1.0.0,3.0.0)",\
 	org.eclipse.microprofile.config; version="[1.0.0,3.0.0)",\
+	javax.management,\
+	javax.management.openmbean,\
 	*
 
 # Export-Package and Private-Package specified in sub-bundles
@@ -76,6 +78,7 @@ Import-Package: \
 	io.openliberty.org.jboss.resteasy.common;version=latest,\
 	io.openliberty.microprofile.telemetry.internal.common;version=latest,\
 	io.openliberty.io.opentelemetry.2.0;version=latest,\
+	io.opentelemetry.semconv:opentelemetry-semconv;version='1.25.0.alpha';strategy=exact,\
 	com.ibm.ws.kernel.boot.common;version=latest
 
 WS-TraceGroup: TELEMETRY
