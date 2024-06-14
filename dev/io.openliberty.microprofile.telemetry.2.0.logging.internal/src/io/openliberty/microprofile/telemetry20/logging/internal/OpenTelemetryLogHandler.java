@@ -125,39 +125,39 @@ public class OpenTelemetryLogHandler extends Collector implements ServerQuiesceL
 	            return null;
 	        }
 	        
-		    // Get Attributes builder to add additional Log fields
-		    AttributesBuilder attributes = Attributes.builder();
+		// Get Attributes builder to add additional Log fields
+		AttributesBuilder attributes = Attributes.builder();
 		    
-		    OpenTelemetry otelInstance = null;
+		OpenTelemetry otelInstance = null;
 	        // Get Extensions (LogRecordContext) from LogData and add it as attributes.
 	        ArrayList<KeyValuePair> extensions = null;
 	        KeyValuePairList kvpl = null;
 	        kvpl = logData.getExtensions();
 	        if (kvpl != null) {
-	            if (kvpl.getKey().equals(LogFieldConstants.EXTENSIONS_KVPL)) {
-	                extensions = kvpl.getList();
-	                for (KeyValuePair k : extensions) {
-	                    String extKey = k.getKey();
-	                    if (extKey.endsWith(CollectorJsonHelpers.INT_SUFFIX)) {
-	                        attributes.put(extKey,  k.getIntValue());
-	                    } else if (extKey.endsWith(CollectorJsonHelpers.FLOAT_SUFFIX)) {
-	                        attributes.put(extKey, k.getFloatValue());
-	                    } else if (extKey.endsWith(CollectorJsonHelpers.LONG_SUFFIX)) {
-	                        attributes.put(extKey, k.getLongValue());
-	                    } else if (extKey.endsWith(CollectorJsonHelpers.BOOL_SUFFIX)) {
-	                        attributes.put(extKey, k.getBooleanValue());
-	                    } else {
-	                        attributes.put(extKey, k.getStringValue());
-	                    }
+	        	if (kvpl.getKey().equals(LogFieldConstants.EXTENSIONS_KVPL)) {
+	                	extensions = kvpl.getList();
+	                	for (KeyValuePair k : extensions) {
+	                    		String extKey = k.getKey();
+	                    		if (extKey.endsWith(CollectorJsonHelpers.INT_SUFFIX)) {
+	                        		attributes.put(extKey,  k.getIntValue());
+	                    		} else if (extKey.endsWith(CollectorJsonHelpers.FLOAT_SUFFIX)) {
+	                        		attributes.put(extKey, k.getFloatValue());
+	                    		} else if (extKey.endsWith(CollectorJsonHelpers.LONG_SUFFIX)) {
+	                        		attributes.put(extKey, k.getLongValue());
+	                    		} else if (extKey.endsWith(CollectorJsonHelpers.BOOL_SUFFIX)) {
+	                        		attributes.put(extKey, k.getBooleanValue());
+	                    		} else {
+	                        		attributes.put(extKey, k.getStringValue());
+	                    		}
 	                    
-	                    if(extKey.equals("ext_appName")) {
-	                    	String appName = k.getStringValue();
-	                    	if(!appName.contains("io.openliberty") && !appName.contains("com.ibm.ws")) {
-	                    		otelInstance = OpenTelemetryAccessor.getOpenTelemetryInfo(appName).getOpenTelemetry();
-	                    	}
-	                    }
-	                }
-	            }
+	                    		if(extKey.equals("ext_appName")) {
+	                    			String appName = k.getStringValue();
+	                    			if(!appName.contains("io.openliberty") && !appName.contains("com.ibm.ws")) {
+	                    				otelInstance = OpenTelemetryAccessor.getOpenTelemetryInfo(appName).getOpenTelemetry();
+	                    			}
+	                    		}
+	                	}
+	            	}
 	        }
 	        
 	        if(otelInstance == null) {
@@ -169,7 +169,8 @@ public class OpenTelemetryLogHandler extends Collector implements ServerQuiesceL
 	            builder = otelInstance.getLogsBridge().loggerBuilder(OpenTelemetryConstants.INSTRUMENTATION_NAME).build().logRecordBuilder();
 	        }
 	        
-	        mapLibertyLogRecordToOTelLogRecord(builder, logData, eventType, attributes);
+	        if(builder != null)
+	        	mapLibertyLogRecordToOTelLogRecord(builder, logData, eventType, attributes);
 	    }
 	    return builder;
 	}

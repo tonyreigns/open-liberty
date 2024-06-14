@@ -223,7 +223,7 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
             return new EnabledOpenTelemetryInfo(true, otelMap.get("io.openliberty.microprofile.telemetry.runtime"), appName);
         } else {
             if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
-                Tr.debug(tc, "Returning app OTEL instance.");
+                Tr.debug(tc, "Returning OTEL instance for appName= {0}", appName);
             }
             return new EnabledOpenTelemetryInfo(true, otelMap.get(appName), appName);
 
@@ -313,7 +313,8 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
                     }
 
                     //Only add telemetry properties if OTEL is enabled.
-                    if (tempProperties.containsKey("otel.sdk.disabled") && "false".equalsIgnoreCase(tempProperties.get("otel.sdk.disabled"))) {
+                    if (tempProperties.containsKey(OpenTelemetryConstants.CONFIG_DISABLE_PROPERTY)
+                        && "false".equalsIgnoreCase(tempProperties.get(OpenTelemetryConstants.CONFIG_DISABLE_PROPERTY))) {
                         telemetryProperties.putAll(tempProperties);
                     }
                     return null;
