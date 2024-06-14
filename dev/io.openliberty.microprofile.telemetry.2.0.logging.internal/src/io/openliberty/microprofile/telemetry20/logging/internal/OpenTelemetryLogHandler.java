@@ -81,7 +81,7 @@ public class OpenTelemetryLogHandler extends Collector implements ServerQuiesceL
 	    if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
 	    	    Tr.debug(tc, "In activate()");
 	    }
-	    this.openTelemetry = getOpenTelemetry();
+	    this.openTelemetry = OpenTelemetryAccessor.getOpenTelemetryInfo("io.openliberty.microprofile.telemetry.runtime").getOpenTelemetry();
 	    // Configure message as the only source.
 	    Map<String, Object> config = setSourceListToConfig(configuration);
 	    super.activate(cc, config);
@@ -124,15 +124,58 @@ public class OpenTelemetryLogHandler extends Collector implements ServerQuiesceL
 	            // To prevent a loop (OL Logs -> OTel Logs -> OL Logs -> OTel Logs).
 	            return null;
 	        }
-	        if (openTelemetry != null)
-	            builder = openTelemetry.getLogsBridge().loggerBuilder(OpenTelemetryConstants.INSTRUMENTATION_NAME).build().logRecordBuilder();
 	        
-	        mapLibertyLogRecordToOTelLogRecord(builder, logData, eventType);
+		// Get Attributes builder to add additional Log fields
+		AttributesBuilder attributes = Attributes.builder();
+		    
+		OpenTelemetry otelInstance = null;
+	        // Get Extensions (LogRecordContext) from LogData and add it as attributes.
+	        ArrayList<KeyValuePair> extensions = null;
+	        KeyValuePairList kvpl = null;
+	        kvpl = logData.getExtensions();
+	        if (kvpl != null) {
+	        	if (kvpl.getKey().equals(LogFieldConstants.EXTENSIONS_KVPL)) {
+	                	extensions = kvpl.getList();
+	                	for (KeyValuePair k : extensions) {
+	                    		String extKey = k.getKey();
+	                    		if (extKey.endsWith(CollectorJsonHelpers.INT_SUFFIX)) {
+	                        		attributes.put(extKey,  k.getIntValue());
+	                    		} else if (extKey.endsWith(CollectorJsonHelpers.FLOAT_SUFFIX)) {
+	                        		attributes.put(extKey, k.getFloatValue());
+	                    		} else if (extKey.endsWith(CollectorJsonHelpers.LONG_SUFFIX)) {
+	                        		attributes.put(extKey, k.getLongValue());
+	                    		} else if (extKey.endsWith(CollectorJsonHelpers.BOOL_SUFFIX)) {
+	                        		attributes.put(extKey, k.getBooleanValue());
+	                    		} else {
+	                        		attributes.put(extKey, k.getStringValue());
+	                    		}
+	                    
+	                    		if(extKey.equals("ext_appName")) {
+	                    			String appName = k.getStringValue();
+	                    			if(!appName.contains("io.openliberty") && !appName.contains("com.ibm.ws")) {
+	                    				otelInstance = OpenTelemetryAccessor.getOpenTelemetryInfo(appName).getOpenTelemetry();
+	                    			}
+	                    		}
+	                	}
+	            	}
+	        }
+	        
+	        if(otelInstance == null) {
+	        	otelInstance = this.openTelemetry;
+	        }
+	        
+	        
+	        if (otelInstance != null) {
+	            builder = otelInstance.getLogsBridge().loggerBuilder(OpenTelemetryConstants.INSTRUMENTATION_NAME).build().logRecordBuilder();
+	        }
+	        
+	        if(builder != null)
+	        	mapLibertyLogRecordToOTelLogRecord(builder, logData, eventType, attributes);
 	    }
 	    return builder;
 	}
 	
-	private void mapLibertyLogRecordToOTelLogRecord(LogRecordBuilder builder, LogTraceData logData, String eventType) {
+	private void mapLibertyLogRecordToOTelLogRecord(LogRecordBuilder builder, LogTraceData logData, String eventType, AttributesBuilder attributes) {
         boolean isMessageEvent = eventType.equals(CollectorConstants.MESSAGES_LOG_EVENT_TYPE);
 	    
 	    // Get message from LogData and set it in the LogRecordBuilder
@@ -149,9 +192,6 @@ public class OpenTelemetryLogHandler extends Collector implements ServerQuiesceL
 	    // Get Log Severity from LogData and set it in the LogRecordBuilder
 	    String logSeverity = logData.getSeverity();
 	    builder.setSeverityText(logSeverity);
-	    
-	    // Get Attributes builder to add additional Log fields
-	    AttributesBuilder attributes = Attributes.builder();
 	    
 	    // Add Thread information to Attributes Builder
 	    attributes.put(SemanticAttributes.THREAD_NAME, logData.getThreadName());
@@ -172,29 +212,6 @@ public class OpenTelemetryLogHandler extends Collector implements ServerQuiesceL
 	              .put(LogTraceData.getClassNameKey(0, isMessageEvent), logData.getClassName())
 	              .put(LogTraceData.getSequenceKey(0, isMessageEvent), logData.getSequence());
 	    
-	    // Get Extensions (LogRecordContext) from LogData and add it as attributes.
-	    ArrayList<KeyValuePair> extensions = null;
-	    KeyValuePairList kvpl = null;
-	    kvpl = logData.getExtensions();
-	    if (kvpl != null) {
-	    	    if (kvpl.getKey().equals(LogFieldConstants.EXTENSIONS_KVPL)) {
-	    	    	    extensions = kvpl.getList();
-	    	    	    for (KeyValuePair k : extensions) {
-	    	    	    	 String extKey = k.getKey();
-	    	    	    	 if (extKey.endsWith(CollectorJsonHelpers.INT_SUFFIX)) {
-	    	    	    	    	 attributes.put(extKey,  k.getIntValue());
-	    	    	    	 } else if (extKey.endsWith(CollectorJsonHelpers.FLOAT_SUFFIX)) {
-	    	    	    	    	 attributes.put(extKey, k.getFloatValue());
-	    	    	    	 } else if (extKey.endsWith(CollectorJsonHelpers.LONG_SUFFIX)) {
-	    	    	    	    	 attributes.put(extKey, k.getLongValue());
-	    	    	    	 } else if (extKey.endsWith(CollectorJsonHelpers.BOOL_SUFFIX)) {
-	    	    	    	    	 attributes.put(extKey, k.getBooleanValue());
-	    	    	    	 } else {
-	    	    	    	    	 attributes.put(extKey, k.getStringValue());
-	    	    	    	 }
-	    	    	    }
-	    	    }
-	    }
 	    
 	    // Set the Attributes to the builder.
 	    builder.setAllAttributes(attributes.build());
@@ -245,15 +262,6 @@ public class OpenTelemetryLogHandler extends Collector implements ServerQuiesceL
 	        tle = new TelemetryLogEmitter();
 	    }
 	    return tle;
-	}
-	
-	public OpenTelemetry getOpenTelemetry() {
-	    OpenTelemetry openTelemetry = null;
-	    ClassLoader newClassLoader = OpenTelemetry.noop().getClass().getClassLoader();     
-         
-	    OpenTelemetryInfo openTelemetryInfo = OpenTelemetryAccessor.getServerOpenTelemetryInfo(newClassLoader);
-	    openTelemetry = openTelemetryInfo.getOpenTelemetry();
-	    return openTelemetry;
 	}
 	
 	private Map<String, Object> setSourceListToConfig(Map<String, Object> configuration) {
