@@ -323,7 +323,7 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
             if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
                 Tr.debug(tc, "Runtime OTEL instance is being configured with the properties: {0}", telemetryProperties);
             }
-            
+
             return telemetryProperties;
         } catch (Exception e) {
             e.printStackTrace();
