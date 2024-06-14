@@ -43,7 +43,6 @@ import com.ibm.wsspi.collector.manager.Handler;
 import com.ibm.wsspi.kernel.service.utils.ServerQuiesceListener;
 
 import io.openliberty.microprofile.telemetry.internal.common.constants.OpenTelemetryConstants;
-import io.openliberty.microprofile.telemetry.internal.common.info.OpenTelemetryInfo;
 import io.openliberty.microprofile.telemetry.internal.interfaces.OpenTelemetryAccessor;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.Attributes;
@@ -163,7 +162,6 @@ public class OpenTelemetryLogHandler extends Collector implements ServerQuiesceL
 	        if(otelInstance == null) {
 	        	otelInstance = this.openTelemetry;
 	        }
-	        
 	        
 	        if (otelInstance != null) {
 	            builder = otelInstance.getLogsBridge().loggerBuilder(OpenTelemetryConstants.INSTRUMENTATION_NAME).build().logRecordBuilder();

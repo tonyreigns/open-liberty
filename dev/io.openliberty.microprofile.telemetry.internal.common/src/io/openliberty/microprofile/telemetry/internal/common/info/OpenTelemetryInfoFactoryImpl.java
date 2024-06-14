@@ -259,7 +259,7 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
             for (String propertyName : config.getPropertyNames()) {
                 if (propertyName.startsWith("otel") || propertyName.startsWith("OTEL")) {
                     String normalizedName = propertyName.toLowerCase().replace('_', '.');
-                    config.getOptionalValue(propertyName, String.class)
+                    config.getOptionalValue(normalizedName, String.class)
                           .ifPresent(value -> telemetryProperties.put(normalizedName, value));
                 }
             }
