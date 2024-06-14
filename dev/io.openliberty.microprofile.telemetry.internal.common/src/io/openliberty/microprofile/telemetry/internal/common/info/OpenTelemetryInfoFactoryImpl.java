@@ -132,7 +132,7 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
 
     public OpenTelemetryInfo createServerOpenTelemetryInfo() {
         try {
-            String otelInstanceName = "io.openliberty.io.telemetry.runtime";
+            String otelInstanceName = "io.openliberty.microprofile.telemetry.runtime";
 
             if (AgentDetection.isAgentActive()) {
                 // If we're using the agent, it will have set GlobalOpenTelemetry and we must use its instance
@@ -216,9 +216,15 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
     @Override
     public OpenTelemetryInfo getOpenTelemetryInfo(String appName) {
         //Return runtime instance if it exists, otherwise return the app instance.
-        if (otelMap.get("io.openliberty.io.telemetry.runtime") != null) {
-            return new EnabledOpenTelemetryInfo(true, otelMap.get("io.openliberty.io.telemetry.runtime"), appName);
+        if (otelMap.get("io.openliberty.microprofile.telemetry.runtime") != null) {
+            if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
+                Tr.debug(tc, "Returning io.openliberty.microprofile.telemetry.runtime OTEL instance.");
+            }
+            return new EnabledOpenTelemetryInfo(true, otelMap.get("io.openliberty.microprofile.telemetry.runtime"), appName);
         } else {
+            if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
+                Tr.debug(tc, "Returning app OTEL instance.");
+            }
             return new EnabledOpenTelemetryInfo(true, otelMap.get(appName), appName);
 
         }
@@ -314,6 +320,10 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
                 }
             });
 
+            if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
+                Tr.debug(tc, "Runtime OTEL instance is being configured with the properties: {0}", telemetryProperties);
+            }
+            
             return telemetryProperties;
         } catch (Exception e) {
             e.printStackTrace();

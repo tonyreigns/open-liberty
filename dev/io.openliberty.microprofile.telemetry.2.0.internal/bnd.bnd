@@ -53,8 +53,6 @@ Import-Package: \
 	org.eclipse.microprofile.rest.client; version="[1.0.0,3.0.0)",\
 	org.eclipse.microprofile.rest.client.spi; version="[1.0.0,3.0.0)",\
 	org.eclipse.microprofile.config; version="[1.0.0,3.0.0)",\
-	javax.management,\
-	javax.management.openmbean,\
 	*
 
 # Export-Package and Private-Package specified in sub-bundles

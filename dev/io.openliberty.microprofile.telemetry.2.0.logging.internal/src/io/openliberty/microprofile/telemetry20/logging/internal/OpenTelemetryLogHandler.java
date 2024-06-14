@@ -81,7 +81,7 @@ public class OpenTelemetryLogHandler extends Collector implements ServerQuiesceL
 	    if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
 	    	    Tr.debug(tc, "In activate()");
 	    }
-	    this.openTelemetry = OpenTelemetryAccessor.getOpenTelemetryInfo("io.openliberty.io.telemetry.runtime").getOpenTelemetry();
+	    this.openTelemetry = OpenTelemetryAccessor.getOpenTelemetryInfo("io.openliberty.microprofile.telemetry.runtime").getOpenTelemetry();
 	    // Configure message as the only source.
 	    Map<String, Object> config = setSourceListToConfig(configuration);
 	    super.activate(cc, config);

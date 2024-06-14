@@ -44,8 +44,6 @@ Import-Package: \
     com.ibm.wsspi.collector.manager,\
     com.ibm.ws.collector*,\
     io.openliberty.microprofile.telemetry.internal.common,\
-    javax.management,\
-    javax.management.openmbean,\
     *
 
 -dsannotations: \
