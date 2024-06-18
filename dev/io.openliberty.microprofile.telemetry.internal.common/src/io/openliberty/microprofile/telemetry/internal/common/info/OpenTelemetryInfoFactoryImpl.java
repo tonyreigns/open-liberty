@@ -89,11 +89,7 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
         this.openTelemetryVersionedConfiguration = openTelemetryVersionedConfiguration;
 
         OpenTelemetry runtimeInstance = this.openTelemetryVersionedConfiguration.createServerOpenTelemetryInfo(getServerTelemetryProperties());
-
-        if (runtimeInstance != null)
-            otelMap.put(OpenTelemetryConstants.OTEL_RUNTIME_INSTANCE_NAME, runtimeInstance);
-        else
-            otelMap.put(OpenTelemetryConstants.OTEL_RUNTIME_INSTANCE_NAME, null);
+        otelMap.put(OpenTelemetryConstants.OTEL_RUNTIME_INSTANCE_NAME, runtimeInstance);
     }
 
     @Override
@@ -249,26 +245,24 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
 
                     HashMap<String, String> tempProperties = new HashMap<>();
 
-                    //Check system properties for all configured OTEL properties
-                    for (Object propertyName : systemProperties.keySet()) {
-                        String normalizedName = ((String) propertyName).toLowerCase().replace('_', '.');
-                        if (normalizedName.startsWith("otel")) {
-                            String propertyValue = (String) systemProperties.get(propertyName);
-
-                            if (propertyValue != null) {
-                                tempProperties.put(normalizedName, propertyValue);
-                            }
-                        }
-
-                    }
-
-                    //Check system environment for all configured OTEL properties and replace any
-                    //previously configured values found in the system properties.
+                    //Check system environment for all configured OTEL properties
                     for (String propertyName : envProperties.keySet()) {
                         if (propertyName.startsWith("otel") || propertyName.startsWith("OTEL")) {
 
                             String normalizedName = propertyName.toLowerCase().replace('_', '.');
                             String propertyValue = envProperties.get(propertyName);
+
+                            if (propertyValue != null)
+                                tempProperties.put(normalizedName, propertyValue);
+                        }
+                    }
+
+                    //Check system properties for all configured OTEL properties and replace any
+                    //previously configured values found in the system properties.
+                    for (Object propertyName : systemProperties.keySet()) {
+                        String normalizedName = ((String) propertyName).toLowerCase().replace('_', '.');
+                        if (normalizedName.startsWith("otel")) {
+                            String propertyValue = (String) systemProperties.get(propertyName);
 
                             if (tempProperties.containsKey(normalizedName))
                                 tempProperties.remove(normalizedName);
@@ -276,6 +270,7 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
                             if (propertyValue != null)
                                 tempProperties.put(normalizedName, propertyValue);
                         }
+
                     }
 
                     //Only add telemetry properties if OTEL is enabled.
@@ -293,7 +288,6 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
 
             return telemetryProperties;
         } catch (Exception e) {
-            e.printStackTrace();
             Tr.error(tc, Tr.formatMessage(tc, "CWMOT5002.telemetry.error", e));
             return new HashMap<String, String>();
         }
