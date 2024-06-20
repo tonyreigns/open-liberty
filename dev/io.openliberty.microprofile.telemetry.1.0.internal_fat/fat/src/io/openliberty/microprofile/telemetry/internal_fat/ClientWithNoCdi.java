@@ -33,12 +33,11 @@ import componenttest.annotation.TestServlets;
 import componenttest.custom.junit.runner.FATRunner;
 import componenttest.custom.junit.runner.Mode;
 import componenttest.custom.junit.runner.Mode.TestMode;
-import componenttest.rules.repeater.FeatureReplacementAction;
-import componenttest.rules.repeater.MicroProfileActions;
 import componenttest.rules.repeater.RepeatTests;
 import componenttest.topology.impl.LibertyServer;
 import componenttest.topology.utils.HttpRequest;
 import io.openliberty.microprofile.telemetry.internal_fat.apps.clientnocdi.ClientTriggeringServlet;
+import io.openliberty.microprofile.telemetry.internal_fat.apps.telemetry.OpenTelemetryBeanServlet;
 
 @Mode(TestMode.FULL)
 @RunWith(FATRunner.class)
@@ -60,6 +59,7 @@ public class ClientWithNoCdi {
     public static void setUp() throws Exception {
 
         WebArchive noCDIApp = ShrinkWrap.create(WebArchive.class, NO_CDI_APP_NAME + ".war")
+                        .addAsResource(OpenTelemetryBeanServlet.class.getResource("microprofile-config.properties"), "META-INF/microprofile-config.properties")
                         .addPackage(ClientTriggeringServlet.class.getPackage());
         CDIArchiveHelper.addBeansXML(noCDIApp, com.ibm.websphere.simplicity.beansxml.BeansAsset.DiscoveryMode.NONE);//Not strictly needed unless we expand this test to cover MP rest client.
 

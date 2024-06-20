@@ -1,1 +1,2 @@
 -Dio.opentelemetry.context.enableStrictContext=true
+-Dcom.ibm.ws.logging.trace.specification=io.openliberty.microprofile.telemetry.internal.common=all
