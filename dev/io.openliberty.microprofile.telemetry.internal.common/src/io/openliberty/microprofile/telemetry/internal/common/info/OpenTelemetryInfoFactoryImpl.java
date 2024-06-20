@@ -19,6 +19,13 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
+import org.apache.commons.lang3.concurrent.LazyInitializer;
+import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.config.ConfigProvider;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
 import com.ibm.ws.container.service.app.deploy.ApplicationInfo;
@@ -30,13 +37,6 @@ import com.ibm.ws.runtime.metadata.ApplicationMetaData;
 import com.ibm.ws.runtime.metadata.ComponentMetaData;
 import com.ibm.ws.runtime.metadata.MetaDataSlot;
 import com.ibm.ws.threadContext.ComponentMetaDataAccessorImpl;
-
-import org.apache.commons.lang3.concurrent.LazyInitializer;
-import org.eclipse.microprofile.config.Config;
-import org.eclipse.microprofile.config.ConfigProvider;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import io.openliberty.microprofile.telemetry.internal.common.AgentDetection;
 import io.openliberty.microprofile.telemetry.internal.common.constants.OpenTelemetryConstants;
@@ -188,12 +188,16 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
                 Tr.debug(tc, "Returning {0} OTEL instance.", OpenTelemetryConstants.OTEL_RUNTIME_INSTANCE_NAME);
             }
             return new EnabledOpenTelemetryInfo(true, otelMap.get(OpenTelemetryConstants.OTEL_RUNTIME_INSTANCE_NAME), appName);
-        } else {
+        } else if (otelMap.get(appName) != null) {
             if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
                 Tr.debug(tc, "Returning OTEL instance for appName= {0}", appName);
             }
             return new EnabledOpenTelemetryInfo(true, otelMap.get(appName), appName);
-
+        } else {
+            if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
+                Tr.debug(tc, "Returning Disabled OpenTelemetryInfo instance");
+            }
+            return new DisabledOpenTelemetryInfo();
         }
 
     }
@@ -233,7 +237,9 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
 
                 }
             }
-
+            if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
+                Tr.debug(tc, "App OTEL instance is being configured with the properties: {0}", telemetryProperties);
+            }
             return telemetryProperties;
         } catch (Exception e) {
             Tr.error(tc, Tr.formatMessage(tc, "CWMOT5002.telemetry.error", e));
