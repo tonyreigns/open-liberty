@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -43,6 +43,7 @@ public class FFDCSource implements Source {
     private IncidentHandler incidentHandler;
 
     protected synchronized void activate(Map<String, Object> configuration) {
+        System.out.println("Activating FFDC");
         if (TraceComponent.isAnyTracingEnabled() && tc.isEventEnabled()) {
             Tr.event(tc, "Activating " + this);
         }
@@ -121,6 +122,7 @@ public class FFDCSource implements Source {
                 FFDCData ffdcData = new FFDCData();
 
                 long timeStampVal = in.getTimeStamp();
+                ffdcData.setClassLoader(Thread.currentThread().getContextClassLoader());
                 ffdcData.setDatetime(timeStampVal);
                 ffdcData.setMessage(th.getMessage());
                 ffdcData.setClassName(in.getSourceId());

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -62,6 +62,8 @@ public class FFDCData extends GenericData {
 
     private static NameAliases[] nameAliases = { jsonLoggingNameAliases, logstashNameAliases };
 
+    private ClassLoader classLoader;
+
     public static void newJsonLoggingNameAliases(Map<String, String> newAliases) {
         jsonLoggingNameAliases.newAliases(newAliases);
     }
@@ -76,6 +78,14 @@ public class FFDCData extends GenericData {
 
     private void setPair(int index, long l) {
         setPair(index, NAMES_JSON[index], l);
+    }
+
+    public void setClassLoader(ClassLoader contextClassLoader) {
+        this.classLoader = contextClassLoader;
+    }
+
+    public ClassLoader getClassLoader() {
+        return classLoader;
     }
 
     //@formatter:off

@@ -36,9 +36,12 @@ import com.ibm.ws.logging.collector.CollectorConstants;
 import com.ibm.ws.logging.collector.CollectorJsonHelpers;
 import com.ibm.ws.logging.collector.CollectorJsonUtils;
 import com.ibm.ws.logging.collector.LogFieldConstants;
+import com.ibm.ws.logging.data.FFDCData;
 import com.ibm.ws.logging.data.KeyValuePair;
 import com.ibm.ws.logging.data.KeyValuePairList;
 import com.ibm.ws.logging.data.LogTraceData;
+import com.ibm.ws.runtime.metadata.ComponentMetaData;
+import com.ibm.ws.threadContext.ComponentMetaDataAccessorImpl;
 import com.ibm.wsspi.collector.manager.Handler;
 import com.ibm.wsspi.kernel.service.utils.ServerQuiesceListener;
 
@@ -170,6 +173,21 @@ public class OpenTelemetryLogHandler extends Collector implements ServerQuiesceL
 	        if(builder != null)
 	        	mapLibertyLogRecordToOTelLogRecord(builder, logData, eventType, attributes);
 	    }
+	    else if (eventType.equals(CollectorConstants.FFDC_EVENT_TYPE)) {
+
+	            FFDCData logData = (FFDCData) event;
+
+	            System.out.println("FFDC event received");
+
+	            Thread.currentThread().setContextClassLoader(logData.getClassLoader());
+	            ComponentMetaData metaData = ComponentMetaDataAccessorImpl.getComponentMetaDataAccessor().getComponentMetaData();
+	            if (metaData != null) {
+	                String appName = metaData.getJ2EEName().getApplication();
+	                System.out.println("App found: " + appName);
+	            } else {
+	                System.out.println("Metadata is null");
+	            }
+	        }
 	    return builder;
 	}
 	
@@ -263,7 +281,7 @@ public class OpenTelemetryLogHandler extends Collector implements ServerQuiesceL
 	
 	private Map<String, Object> setSourceListToConfig(Map<String, Object> configuration) {
 	    Map<String, Object> config = new HashMap<>(configuration);
-	    String[] sourceList = new String[]{"message"};
+	    String[] sourceList = new String[]{"message", "ffdc"};
 	    config.put(SOURCE_LIST_KEY, sourceList);
 	    return config;
 	}
