@@ -506,7 +506,7 @@ public class SessionAffinityManagerImpl extends SessionAffinityManager {
                             try { //start tWAS 755981 (Liberty - SCWI 135422)
                                     throw new Exception("Stack trace for SESN0066E:"); // stack trace for when responseAlreadyCommitted message shows up
                             } catch (Throwable th) {
-                                    com.ibm.ws.ffdc.FFDCFilter.processException(th, "com.ibm.ws.webcontainer.session.impl.SessionAffinityManagerImpl", "398", null);
+                                    com.ibm.ws.ffdc.FFDCFilter.processException(th, "com.ibm.ws.webcontainer.session.impl.SessionAffinityManagerImpl", "398", Thread.currentThread().getContextClassLoader());
                             } // end tWAS 755981 (Liberty - SCWI 135422)
                         }
                     }
@@ -625,7 +625,7 @@ public class SessionAffinityManagerImpl extends SessionAffinityManager {
                     try { //start tWAS 755981 (Liberty - SCWI 135422)
                         throw new Exception("Stack trace for SESN0066E:"); // stack trace for when responseAlreadyCommitted message shows up
                     } catch (Throwable th) {
-                        com.ibm.ws.ffdc.FFDCFilter.processException(th, "com.ibm.ws.webcontainer.session.impl.SessionAffinityManagerImpl", "467", null);
+                        com.ibm.ws.ffdc.FFDCFilter.processException(th, "com.ibm.ws.webcontainer.session.impl.SessionAffinityManagerImpl", "467", Thread.currentThread().getContextClassLoader());
                     } // end tWAS 755981 (Liberty - SCWI 135422)
                 }
                 // return;

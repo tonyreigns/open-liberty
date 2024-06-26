@@ -133,7 +133,7 @@ public class ProvisionerImpl implements Provisioner {
             Map<String, Throwable> installExceptions = installStatus.getInstallExceptions();
             for (Entry<String, Throwable> entry : installExceptions.entrySet()) {
                 FFDCFilter.processException(entry.getValue(), ME, m, this,
-                                            new Object[] { entry.getKey() });
+                                            new Object[] { entry.getKey() }, Thread.currentThread().getContextClassLoader());
             }
             throw new LaunchException("Exceptions occurred while installing platform bundles", BootstrapConstants.messages.getString("error.platformBundleException"));
         }
@@ -160,7 +160,7 @@ public class ProvisionerImpl implements Provisioner {
             for (Entry<Bundle, Throwable> entry : startExceptions.entrySet()) {
                 Bundle b = entry.getKey();
                 FFDCFilter.processException(entry.getValue(), ME, m, this,
-                                            new Object[] { b.getLocation() });
+                                            new Object[] { b.getLocation() }, Thread.currentThread().getContextClassLoader());
             }
 
             throw new LaunchException("Exceptions occurred while starting platform bundles", BootstrapConstants.messages.getString("error.platformBundleException"));

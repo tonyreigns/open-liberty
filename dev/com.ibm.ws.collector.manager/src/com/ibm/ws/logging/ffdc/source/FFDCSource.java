@@ -92,6 +92,8 @@ public class FFDCSource implements Source {
      *
      */
     private void startSource() {
+        System.out.println("###############/n STARTING SOURCE!");
+
         incidentHandler = new IncidentHandler();
         FFDC.registerIncidentForwarder(incidentHandler);
     }
@@ -110,7 +112,7 @@ public class FFDCSource implements Source {
 
         /** {@inheritDoc} */
         @Override
-        public void process(Incident in, Throwable th) {
+        public void process(Incident in, Throwable th, ClassLoader classloader) {
 
             int countVal = in.getCount();
 
@@ -121,8 +123,11 @@ public class FFDCSource implements Source {
 
                 FFDCData ffdcData = new FFDCData();
 
+                System.out.println("New classloader: " + classloader);
                 long timeStampVal = in.getTimeStamp();
-                ffdcData.setClassLoader(Thread.currentThread().getContextClassLoader());
+
+                ffdcData.setClassLoader(classloader);
+
                 ffdcData.setDatetime(timeStampVal);
                 ffdcData.setMessage(th.getMessage());
                 ffdcData.setClassName(in.getSourceId());

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -66,8 +66,8 @@ public class InjectInjectionBinding extends InjectionSimpleBinding<Inject> {
      * <p>
      *
      * @throws Exception
-     *             if a problem occurs while creating the instance to be
-     *             injected.
+     *                       if a problem occurs while creating the instance to be
+     *                       injected.
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -174,7 +174,7 @@ public class InjectInjectionBinding extends InjectionSimpleBinding<Inject> {
             // be normal and the caller should decide if FFDC is needed.
             if (targetObject != null) {
                 FFDCFilter.processException(ex, CLASS_NAME + ".getInjectionObject",
-                                            "408", this, (Object[]) null);
+                                            "408", this, (Object[]) null, Thread.currentThread().getContextClassLoader());
             }
 
             String displayName = getDisplayName();

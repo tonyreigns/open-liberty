@@ -689,7 +689,7 @@ final public class SessionProperties {
         try {
             sysProp = System.getProperty(propName);
         } catch (Throwable th) {
-            com.ibm.ws.ffdc.FFDCFilter.processException(th, "com.ibm.ws.session.SessionProperties", "285", null);
+            com.ibm.ws.ffdc.FFDCFilter.processException(th, "com.ibm.ws.session.SessionProperties", "285", Thread.currentThread().getContextClassLoader());
             LoggingUtil.SESSION_LOGGER_CORE.logp(Level.SEVERE, methodClassName, propName, "CommonMessage.exception", th);
         }
         return sysProp;

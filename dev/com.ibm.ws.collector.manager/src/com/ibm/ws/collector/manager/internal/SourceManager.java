@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -92,6 +92,7 @@ public class SourceManager {
             bufferMgr = new BufferManagerImpl(BUFFER_SIZE, sourceId, false);
             //Inform the source that a buffer is now available
             //and it can start sending events to this buffer.
+            System.out.println("Setting buffer manager!");
             source.setBufferManager(this.bufferMgr);
         }
         subscribers.add(handlerId);

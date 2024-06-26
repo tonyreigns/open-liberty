@@ -17,6 +17,6 @@
 		<classloader apiTypeVisibility="+third-party"/>
 	</application>
 	
-	<logging traceSpecification="TELEMETRY=all"/>
+	<logging traceSpecification="TELEMETRY=all:io.openliberty.microprofile.telemetry.internal.common=all"/>
 
 </server>

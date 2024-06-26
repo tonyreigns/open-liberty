@@ -19,5 +19,5 @@ package com.ibm.wsspi.logging;
  * @ibm-spi
  */
 public interface IncidentForwarder {
-    public void process(Incident incident, Throwable th);
+    public void process(Incident incident, Throwable th, ClassLoader classLoader);
 }
