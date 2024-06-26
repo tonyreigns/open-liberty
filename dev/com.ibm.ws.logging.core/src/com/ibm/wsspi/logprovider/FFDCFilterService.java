@@ -124,6 +124,8 @@ public interface FFDCFilterService {
      */
     void processException(Throwable th, String sourceId, String probeId, Object callerThis, Object[] objectArray);
 
+	void processException(Throwable th, String sourceId, String probeId, Object callerThis, ClassLoader classloader);
+
     /**
      * Initialize FFDC service from set of initial properties
      * 
@@ -150,4 +152,8 @@ public interface FFDCFilterService {
      * @param config
      */
     void update(LogProviderConfig config);
+
+	void processException(Throwable th, String sourceId, String probeId, Object callerThis, Object[] objectArray,
+			ClassLoader classloader);
+    
 }

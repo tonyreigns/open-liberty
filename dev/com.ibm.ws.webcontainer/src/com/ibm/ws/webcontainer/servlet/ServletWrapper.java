@@ -366,7 +366,7 @@ public abstract class ServletWrapper extends GenericServlet implements RequestPr
             evtSource.onServletUnloaded(errorEvent);
             throw e;
         } catch (Throwable e) {
-            com.ibm.wsspi.webcontainer.util.FFDCWrapper.processException(e, "com.ibm.ws.webcontainer.servlet.ServletWrapper.init", "181", this);
+            com.ibm.wsspi.webcontainer.util.FFDCWrapper.processException(e, "com.ibm.ws.webcontainer.servlet.ServletWrapper.init", "181", this, Thread.currentThread().getContextClassLoader());
             logger.logp(Level.SEVERE, CLASS_NAME, "init", "uncaught.init.exception.thrown.by.servlet", new Object[] { getServletName(),
                     getWebApp().getApplicationName(), e });
             ServletErrorEvent errorEvent = new ServletErrorEvent(this, getServletContext(), getServletName(), servletConfig.getClassName(), e);

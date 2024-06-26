@@ -61,6 +61,14 @@ public final class FFDCFilter {
     public static void processException(Throwable th, String sourceId, String probeId, Object callerThis) {
         FFDCConfigurator.getDelegate().processException(th, sourceId, probeId, callerThis);
     }
+    
+    public static void processException(Throwable th, String sourceId, String probeId, ClassLoader classloader) {
+        FFDCConfigurator.getDelegate().processException(th, sourceId, probeId, classloader);
+    }
+    
+    public static void processException(Throwable th, String sourceId, String probeId, Object callerThis, ClassLoader classloader) {
+        FFDCConfigurator.getDelegate().processException(th, sourceId, probeId, callerThis, classloader);
+    }
 
     /**
      * Write a first failure data capture record for the provided throwable
@@ -93,7 +101,15 @@ public final class FFDCFilter {
      *            An array of objects which will be introspected for inclusion in the FFDC record
      */
     public static void processException(Throwable th, String sourceId, String probeId, Object callerThis, Object[] objectArray) {
-        FFDCConfigurator.getDelegate().processException(th, sourceId, probeId, callerThis, objectArray);
+    	 System.out.println("###############/n In FFDC FILTER TRACE!");
+         for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+             System.out.println(ste + "\n");
+         }
+    	FFDCConfigurator.getDelegate().processException(th, sourceId, probeId, callerThis, objectArray);
+    }
+    
+    public static void processException(Throwable th, String sourceId, String probeId, Object callerThis, Object[] objectArray, ClassLoader classloader) {
+        FFDCConfigurator.getDelegate().processException(th, sourceId, probeId, callerThis, objectArray, classloader);
     }
 
     /**

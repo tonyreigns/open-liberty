@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -91,6 +91,8 @@ public class FFDCSource implements Source {
      *
      */
     private void startSource() {
+        System.out.println("###############/n STARTING SOURCE!");
+
         incidentHandler = new IncidentHandler();
         FFDC.registerIncidentForwarder(incidentHandler);
     }
@@ -109,7 +111,7 @@ public class FFDCSource implements Source {
 
         /** {@inheritDoc} */
         @Override
-        public void process(Incident in, Throwable th) {
+        public void process(Incident in, Throwable th, ClassLoader classloader) {
 
             int countVal = in.getCount();
 
@@ -120,7 +122,10 @@ public class FFDCSource implements Source {
 
                 FFDCData ffdcData = new FFDCData();
 
+                System.out.println("New classloader: " + classloader);
                 long timeStampVal = in.getTimeStamp();
+                ffdcData.setClassLoader(classloader);
+
                 ffdcData.setDatetime(timeStampVal);
                 ffdcData.setMessage(th.getMessage());
                 ffdcData.setClassName(in.getSourceId());

@@ -73,6 +73,8 @@ import com.ibm.ws.cdi.internal.interfaces.WebSphereBeanDeploymentArchive;
 import com.ibm.ws.cdi.internal.interfaces.WebSphereCDIDeployment;
 import com.ibm.ws.cdi.internal.interfaces.WebSphereInjectionServices;
 import com.ibm.ws.cdi.utils.WeldCDIUtils;
+import com.ibm.ws.runtime.metadata.ComponentMetaData;
+import com.ibm.ws.threadContext.ComponentMetaDataAccessorImpl;
 import com.ibm.wsspi.injectionengine.ReferenceContext;
 
 /**
@@ -242,7 +244,7 @@ public class BeanDeploymentArchiveImpl implements WebSphereBeanDeploymentArchive
                 // If the server.xml has the configuration of enableImplicitBeanArchives sets to false, we will not scan the implicit bean archives
                 beanDiscoveryMode = BeanDiscoveryMode.NONE;
             } else if (archive.getType() == ArchiveType.RUNTIME_EXTENSION) {
-                // Runtime extensions default to none as they are extension archives (and this means that only classes explicitly returned by getBeans() will be a bean. 
+                // Runtime extensions default to none as they are extension archives (and this means that only classes explicitly returned by getBeans() will be a bean.
                 // But if another component has added a beans.xml we will honour their request.
                 beanDiscoveryMode = BeanDiscoveryMode.NONE;
             }
@@ -985,6 +987,13 @@ public class BeanDeploymentArchiveImpl implements WebSphereBeanDeploymentArchive
         try {
             annotatedType = beanManager.createAnnotatedType(clazz);
         } catch (ResourceLoadingException rle) {
+            ComponentMetaData metaData = ComponentMetaDataAccessorImpl.getComponentMetaDataAccessor().getComponentMetaData();
+            if (metaData != null) {
+                String appName = metaData.getJ2EEName().getApplication();
+                System.out.println("App found(bean): " + appName);
+            } else {
+                System.out.println("Metadata is null(bean)");
+            }
             //noop
             //ignore if the JavaEE component class cannot be loaded. It is possible it is not used in the application
             //but Web Container added it in.

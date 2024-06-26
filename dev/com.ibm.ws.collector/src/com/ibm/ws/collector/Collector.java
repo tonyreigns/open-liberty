@@ -49,7 +49,7 @@ public abstract class Collector implements Handler, Formatter {
     //No of events the buffer will hold before it gets flushed
     private final int maxSize = 10000;
     //Buffer flush time interval
-    private final long period = 5000;
+    private final long period = 1;
 
     /** Collector manager reference */
     private volatile CollectorManager collectorMgr;

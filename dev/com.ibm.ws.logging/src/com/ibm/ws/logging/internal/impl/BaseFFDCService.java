@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -154,90 +154,101 @@ public class BaseFFDCService implements FFDCFilterService {
      * Process an exception
      *
      * @param th
-     *            The exception to be processed
+     *                     The exception to be processed
      * @param sourceId
-     *            The source id of the reporting code
+     *                     The source id of the reporting code
      * @param probeId
-     *            The probe of the reporting code
+     *                     The probe of the reporting code
      */
     @Override
     public void processException(Throwable th, String sourceId, String probeId) {
-        log(sourceId, probeId, th, null, null);
+        log(sourceId, probeId, th, null, null, null);
     }
 
     /**
      * Process an exception
      *
      * @param th
-     *            The exception to be processed
+     *                       The exception to be processed
      * @param sourceId
-     *            The source id of the reporting code
+     *                       The source id of the reporting code
      * @param probeId
-     *            The probe of the reporting code
+     *                       The probe of the reporting code
      * @param callerThis
-     *            The instance of the reporting code
+     *                       The instance of the reporting code
      */
 
     @Override
     public void processException(Throwable th, String sourceId, String probeId, Object callerThis) {
-        log(sourceId, probeId, th, callerThis, null);
+        log(sourceId, probeId, th, callerThis, null, null);
     }
 
     /**
      * Process an exception
      *
      * @param th
-     *            The exception to be processed
+     *                        The exception to be processed
      * @param sourceId
-     *            The source id of the reporting code
+     *                        The source id of the reporting code
      * @param probeId
-     *            The probe of the reporting code
+     *                        The probe of the reporting code
      * @param objectArray
-     *            An array of additional interesting objects
+     *                        An array of additional interesting objects
      */
     @Override
     public void processException(Throwable th, String sourceId, String probeId, Object[] objectArray) {
-        log(sourceId, probeId, th, null, objectArray);
+        log(sourceId, probeId, th, null, objectArray, null);
     }
 
     /**
      * Process an exception
      *
      * @param th
-     *            The exception to be processed
+     *                        The exception to be processed
      * @param sourceId
-     *            The source id of the reporting code
+     *                        The source id of the reporting code
      * @param probeId
-     *            The probe of the reporting code
+     *                        The probe of the reporting code
      * @param callerThis
-     *            The instance of the reporting code
+     *                        The instance of the reporting code
      * @param objectArray
-     *            An array of additional interesting objects
+     *                        An array of additional interesting objects
      */
     @Override
     public void processException(Throwable th, String sourceId, String probeId, Object callerThis, Object[] objectArray) {
-        log(sourceId, probeId, th, callerThis, objectArray);
+        log(sourceId, probeId, th, callerThis, objectArray, null);
+    }
+
+    @Override
+    public void processException(Throwable th, String sourceId, String probeId, Object callerThis, ClassLoader classloader) {
+        log(sourceId, probeId, th, callerThis, null, classloader);
+    }
+
+    @Override
+    public void processException(Throwable th, String sourceId, String probeId, Object callerThis, Object[] objectArray, ClassLoader classloader) {
+        log(sourceId, probeId, th, callerThis, objectArray, classloader);
+
     }
 
     /**
      * Log a problem to the global incident stream (creating it if necessary
      *
      * @param txt
-     *            A description of the incident (the name of the exception)
+     *                        A description of the incident (the name of the exception)
      * @param sourceId
-     *            The source id of the reporting code
+     *                        The source id of the reporting code
      * @param probeId
-     *            The probe id of the reporting code
+     *                        The probe id of the reporting code
      * @param th
-     *            The exception
+     *                        The exception
      * @param callerThis
-     *            The instance of the reporting code (null if no specific
-     *            instance)
+     *                        The instance of the reporting code (null if no specific
+     *                        instance)
      * @param objectArray
-     *            Additional interesting object (null if there aren't any)
+     *                        Additional interesting object (null if there aren't any)
      */
     @FFDCIgnore(PrivilegedActionException.class)
-    private void log(String sourceId, String probeId, Throwable th, Object callerThis, Object[] objectArray) {
+    private void log(String sourceId, String probeId, Throwable th, Object callerThis, Object[] objectArray, ClassLoader classloader) {
         IncidentImpl incident = getIncident(sourceId, probeId, th);
         incident.log(th, callerThis, objectArray);
         if (System.getSecurityManager() == null) {
@@ -252,11 +263,19 @@ public class BaseFFDCService implements FFDCFilterService {
             });
         }
 
+        System.out.println("Classloader received!: " + classloader);
+
+//        System.out.println("###############/n In LOG STACK TRACE!");
+//        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+//            System.out.println(ste + "\n");
+//        }
+
         Set<IncidentForwarder> forwarders = FFDC.getIncidentForwarders();
         if (forwarders.size() > 0) {
             ForwardIncident forwardIncident = new ForwardIncident(incident, th, callerThis, objectArray);
             for (IncidentForwarder forwarder : forwarders) {
-                forwarder.process(forwardIncident, th);
+                System.out.println("Calling process!");
+                forwarder.process(forwardIncident, th, classloader);
             }
         }
 

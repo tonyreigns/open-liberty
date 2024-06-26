@@ -60,4 +60,18 @@ public class DisabledFFDCService implements FFDCFilterService {
     public File getFFDCLogLocation() {
         return new File(".");
     }
+
+	@Override
+	public void processException(Throwable th, String sourceId, String probeId, Object callerThis,
+			ClassLoader classloader) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void processException(Throwable th, String sourceId, String probeId, Object callerThis, Object[] objectArray,
+			ClassLoader classloader) {
+		// TODO Auto-generated method stub
+		
+	}
 }
