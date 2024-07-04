@@ -990,6 +990,7 @@ public class BeanDeploymentArchiveImpl implements WebSphereBeanDeploymentArchive
             ComponentMetaData metaData = ComponentMetaDataAccessorImpl.getComponentMetaDataAccessor().getComponentMetaData();
             if (metaData != null) {
                 String appName = metaData.getJ2EEName().getApplication();
+                System.out.println("Correct classlaoder: " + Thread.currentThread().getContextClassLoader());
                 System.out.println("App found(bean): " + appName);
             } else {
                 System.out.println("Metadata is null(bean)");

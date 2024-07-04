@@ -43,7 +43,7 @@ public final class FFDCFilter {
      *            A unique identifier within the source of this record, for example the source file line number
      */
     public static void processException(Throwable th, String sourceId, String probeId) {
-        FFDCConfigurator.getDelegate().processException(th, sourceId, probeId);
+        FFDCConfigurator.getDelegate().processException(th, sourceId, probeId, Thread.currentThread().getContextClassLoader());
     }
 
     /**
@@ -59,7 +59,7 @@ public final class FFDCFilter {
      *            The object making this call, which will be introspected for inclusion in the FFDC record
      */
     public static void processException(Throwable th, String sourceId, String probeId, Object callerThis) {
-        FFDCConfigurator.getDelegate().processException(th, sourceId, probeId, callerThis);
+        FFDCConfigurator.getDelegate().processException(th, sourceId, probeId, callerThis, Thread.currentThread().getContextClassLoader());
     }
     
     public static void processException(Throwable th, String sourceId, String probeId, ClassLoader classloader) {
@@ -67,6 +67,7 @@ public final class FFDCFilter {
     }
     
     public static void processException(Throwable th, String sourceId, String probeId, Object callerThis, ClassLoader classloader) {
+    	System.out.println("ProcessException class loader:" + Thread.currentThread().getContextClassLoader());
         FFDCConfigurator.getDelegate().processException(th, sourceId, probeId, callerThis, classloader);
     }
 
@@ -83,7 +84,7 @@ public final class FFDCFilter {
      *            An array of objects which will be introspected for inclusion in the FFDC record
      */
     public static void processException(Throwable th, String sourceId, String probeId, Object[] objectArray) {
-        FFDCConfigurator.getDelegate().processException(th, sourceId, probeId, objectArray);
+        FFDCConfigurator.getDelegate().processException(th, sourceId, probeId, objectArray, Thread.currentThread().getContextClassLoader());
     }
 
     /**
@@ -105,7 +106,7 @@ public final class FFDCFilter {
          for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
              System.out.println(ste + "\n");
          }
-    	FFDCConfigurator.getDelegate().processException(th, sourceId, probeId, callerThis, objectArray);
+    	FFDCConfigurator.getDelegate().processException(th, sourceId, probeId, callerThis, objectArray, Thread.currentThread().getContextClassLoader());
     }
     
     public static void processException(Throwable th, String sourceId, String probeId, Object callerThis, Object[] objectArray, ClassLoader classloader) {

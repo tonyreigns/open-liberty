@@ -14,9 +14,11 @@ package com.ibm.ws.logging.ffdc.source;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.ibm.websphere.logging.hpel.LogRecordContext;
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
 import com.ibm.ws.ffdc.FFDC;
@@ -123,11 +125,23 @@ public class FFDCSource implements Source {
 
                 FFDCData ffdcData = new FFDCData();
 
+                Map<String, String> map = new HashMap<>();
+
+                LogRecordContext.getExtensions(map);
+                String appName = null;
+
+                for (String key : map.keySet()) {
+                    if (!key.equals("thread")) {
+                        System.out.println("LOGRECORDCONTEXT(collector)! ------------------ " + key + " -- " + map.get(key));
+                        appName = map.get(key);
+                    }
+                }
+
                 System.out.println("New classloader: " + classloader);
                 long timeStampVal = in.getTimeStamp();
 
                 ffdcData.setClassLoader(classloader);
-
+                ffdcData.setAppName(appName);
                 ffdcData.setDatetime(timeStampVal);
                 ffdcData.setMessage(th.getMessage());
                 ffdcData.setClassName(in.getSourceId());

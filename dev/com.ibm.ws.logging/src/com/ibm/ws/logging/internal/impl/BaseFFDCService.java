@@ -265,6 +265,11 @@ public class BaseFFDCService implements FFDCFilterService {
 
         System.out.println("Classloader received!: " + classloader);
 
+        System.out.println("###############/n In BASEFFDC TRACE!");
+        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+            System.out.println(ste + "\n");
+        }
+
 //        System.out.println("###############/n In LOG STACK TRACE!");
 //        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
 //            System.out.println(ste + "\n");

@@ -63,6 +63,7 @@ public class FFDCData extends GenericData {
     private static NameAliases[] nameAliases = { jsonLoggingNameAliases, logstashNameAliases };
 
     private ClassLoader classLoader;
+    private String appName;
 
     public static void newJsonLoggingNameAliases(Map<String, String> newAliases) {
         jsonLoggingNameAliases.newAliases(newAliases);
@@ -86,6 +87,16 @@ public class FFDCData extends GenericData {
 
     public ClassLoader getClassLoader() {
         return classLoader;
+    }
+
+    public void setAppName(String appName) {
+        // TODO Auto-generated method stub
+        this.appName = appName;
+
+    }
+
+    public String getAppName() {
+        return appName;
     }
 
     //@formatter:off
@@ -122,5 +133,8 @@ public class FFDCData extends GenericData {
     public static String getUserDirKey(int format)              { return nameAliases[format].aliases[10]; }
     public static String getServerNameKey(int format)           { return nameAliases[format].aliases[11]; }
     public static String getTypeKey(int format)                 { return nameAliases[format].aliases[12]; }
+
+
+
 
 }
