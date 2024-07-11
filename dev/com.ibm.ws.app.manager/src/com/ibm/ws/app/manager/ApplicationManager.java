@@ -27,8 +27,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 
-import com.ibm.websphere.ras.annotation.Trivial;
 import com.ibm.websphere.logging.hpel.LogRecordContext;
+import com.ibm.websphere.ras.annotation.Trivial;
 import com.ibm.ws.app.manager.internal.AppManagerConstants;
 
 @Component(service = ApplicationManager.class,
@@ -49,6 +49,7 @@ public class ApplicationManager {
 
     /* Name to use as an extension key for the application name */
     private final static String APPNAME_KEY = "appName";
+    private final static String METADATA_KEY = "metaData";
 
     /* LogRecordContext callback to retrieve application name */
     private final static LogRecordContext.Extension APPNAME_CALLBACK = new LogRecordContext.Extension() {
@@ -60,6 +61,23 @@ public class ApplicationManager {
                 com.ibm.websphere.csi.J2EEName name = metaData.getJ2EEName();
                 if (name != null) {
                     return name.getApplication();
+                }
+            }
+            return null;
+        }
+
+    };
+
+    private final static LogRecordContext.ExtensionMetaData METADATA_CALLBACK = new LogRecordContext.ExtensionMetaData() {
+        @Override
+        @Trivial
+        public Object getValue() {
+            com.ibm.ws.runtime.metadata.ComponentMetaData metaData = com.ibm.ws.threadContext.ComponentMetaDataAccessorImpl.getComponentMetaDataAccessor().getComponentMetaData();
+            if (metaData != null) {
+                com.ibm.websphere.csi.J2EEName name = metaData.getJ2EEName();
+                if (name != null) {
+                    System.out.println("AppMgr Thread: " + Thread.currentThread().getName());
+                    return metaData;
                 }
             }
             return null;
@@ -91,6 +109,10 @@ public class ApplicationManager {
 
         // Register the appName as a LogRecordContext Extension
         LogRecordContext.registerExtension(APPNAME_KEY, APPNAME_CALLBACK);
+        LogRecordContext.registerExtension(METADATA_KEY, METADATA_CALLBACK);
+
+        // LogRecordContextt.registerExtension(METADATA_KEY, METADATA_CALLBACK);
+
     }
 
     /**
@@ -120,6 +142,9 @@ public class ApplicationManager {
 
         // De-register the appName as a LogRecordContext Extension
         LogRecordContext.unregisterExtension(APPNAME_KEY);
+        LogRecordContext.unregisterExtension(METADATA_KEY);
+        // LogRecordContextt.unregisterExtension(METADATA_KEY);
+
     }
 
     /**

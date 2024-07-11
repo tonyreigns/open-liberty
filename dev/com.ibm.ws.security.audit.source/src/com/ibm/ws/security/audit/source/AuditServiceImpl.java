@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -20,6 +20,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import com.ibm.websphere.event.Topic;
+import com.ibm.websphere.logging.hpel.LogRecordContext;
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
 import com.ibm.websphere.security.audit.AuditConstants;
@@ -47,8 +49,10 @@ import com.ibm.ws.collector.manager.buffer.BufferManagerImpl;
 import com.ibm.ws.logging.collector.LogFieldConstants;
 import com.ibm.ws.logging.data.GenericData;
 import com.ibm.ws.logging.utils.SequenceNumber;
+import com.ibm.ws.runtime.metadata.ComponentMetaData;
 import com.ibm.ws.security.audit.event.AuditMgmtEvent;
 import com.ibm.ws.security.audit.source.utils.AuditUtils;
+import com.ibm.ws.threadContext.ComponentMetaDataAccessorImpl;
 import com.ibm.wsspi.collector.manager.BufferManager;
 import com.ibm.wsspi.collector.manager.Source;
 import com.ibm.wsspi.kernel.service.location.VariableRegistry;
@@ -122,7 +126,7 @@ public class AuditServiceImpl implements AuditService, Source {
     private Map<String, Object> thisConfiguration = null;
     //private int maxSavedEvents = 200;
     List<AuditEvent> list = new ArrayList<AuditEvent>();
-    private List<AuditEvent> savedEvent = Collections.synchronizedList(list);
+    private final List<AuditEvent> savedEvent = Collections.synchronizedList(list);
 
     //private AuditEvent[] savedEvent = new AuditEvent[maxSavedEvents];
     private int savedEventIndex = 0;
@@ -132,7 +136,7 @@ public class AuditServiceImpl implements AuditService, Source {
     private boolean auditServiceStarted = false;
     private boolean emitted1 = false;
     private final boolean emitted2 = false;
-    private boolean emitMsgOnce = true; 
+    private final boolean emitMsgOnce = true;
 
     @Activate
     protected void activate(ComponentContext cc, Map<String, Object> configuration) {
@@ -203,7 +207,8 @@ public class AuditServiceImpl implements AuditService, Source {
     }
 
     @Modified
-    protected void modified(Map<String, Object> configuration) {}
+    protected void modified(Map<String, Object> configuration) {
+    }
 
     /*
      * (non-Javadoc)
@@ -458,6 +463,22 @@ public class AuditServiceImpl implements AuditService, Source {
                         gdo.addPair(LogFieldConstants.IBM_THREADID, new Integer((int) Thread.currentThread().getId()));
                         gdo = map2GenericData(gdo, event.getMap());
 
+                        Map<String, String> extMap = new HashMap<>();
+                        LogRecordContext.getExtensions(extMap);
+
+                        String appName = extMap.getOrDefault("appName", "null");
+                        gdo.setAppName(appName);
+
+                        System.out.println("Audit log appName: " + appName);
+
+                        ComponentMetaData metaData = ComponentMetaDataAccessorImpl.getComponentMetaDataAccessor().getComponentMetaData();
+                        if (metaData != null) {
+                            String appName2 = metaData.getJ2EEName().getApplication();
+                            System.out.println("App found2 audit: " + appName2);
+                        } else {
+                            System.out.println("Metadata2 audit is null");
+                        }
+
                         final GenericData f_gdo = gdo;
                         AccessController.doPrivileged(new PrivilegedAction<Void>() {
                             @Override
@@ -502,12 +523,12 @@ public class AuditServiceImpl implements AuditService, Source {
             if (bufferMgr == null)
                 Tr.debug(tc, "emitSavedEvents, bufferMgr is null");
         }
-        if (bufferMgr != null) {                                
+        if (bufferMgr != null) {
             if (!savedEventEmitted) {
 
                 Iterator iter = savedEvent.iterator();
                 while (iter.hasNext()) {
-                    sendEvent((AuditEvent)iter.next());
+                    sendEvent((AuditEvent) iter.next());
                 }
                 savedEvent.clear();
                 savedEventIndex = 0;
@@ -517,7 +538,7 @@ public class AuditServiceImpl implements AuditService, Source {
                 //            sendEvent(savedEvent[i]);
                 //        }
                 //    }
-                    //savedEventEmitted = true;
+                //savedEventEmitted = true;
                 //    savedEvent = new AuditEvent[maxSavedEvents];
                 //    savedEventIndex = 0;
                 //}

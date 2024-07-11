@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.ibm.websphere.logging.hpel.LogRecordContext;
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
 import com.ibm.ws.http.channel.internal.values.AccessLogCurrentTime;
@@ -45,6 +46,8 @@ import com.ibm.ws.logging.data.AccessLogData;
 import com.ibm.ws.logging.data.AccessLogDataFormatter;
 import com.ibm.ws.logging.data.AccessLogDataFormatter.AccessLogDataFormatterBuilder;
 import com.ibm.ws.logging.data.JsonFieldAdder;
+import com.ibm.ws.runtime.metadata.ComponentMetaData;
+import com.ibm.ws.threadContext.ComponentMetaDataAccessorImpl;
 import com.ibm.wsspi.collector.manager.BufferManager;
 import com.ibm.wsspi.collector.manager.Source;
 import com.ibm.wsspi.http.HttpCookie;
@@ -515,6 +518,23 @@ public class AccessLogSource implements Source {
             // Then add the formatters to print out the appropriate fields
             accessLogData.addFormatters(currentSF.getFormatters());
             accessLogData.setSourceName(sourceName);
+
+            Map<String, String> extMap = new HashMap<>();
+            LogRecordContext.getExtensions(extMap);
+
+            System.out.println("Access log:");
+            String appName = extMap.getOrDefault("appName", "null");
+
+            System.out.println("Access log appName: " + appName);
+            accessLogData.setAppName(appName);
+
+            ComponentMetaData metaData = ComponentMetaDataAccessorImpl.getComponentMetaDataAccessor().getComponentMetaData();
+            if (metaData != null) {
+                String appName2 = metaData.getJ2EEName().getApplication();
+                System.out.println("App found2: " + appName2);
+            } else {
+                System.out.println("Metadata2 is null");
+            }
 
             bufferMgr.add(accessLogData);
             // CollectorJSONUtils does the rest of the work from here

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -19,6 +19,8 @@ public class GenericData {
     private KeyValuePair[] pairs;
 
     private String sourceName;
+
+    private String appName;
 
     private String jsonMessage = null;
 
@@ -131,6 +133,14 @@ public class GenericData {
 
     public void setSourceName(String sourceName) {
         this.sourceName = sourceName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+    public String getAppName() {
+        return this.appName;
     }
 
     /** {@inheritDoc} */

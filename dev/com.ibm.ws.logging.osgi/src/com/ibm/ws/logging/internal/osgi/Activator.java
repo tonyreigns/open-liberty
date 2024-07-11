@@ -14,13 +14,16 @@
 package com.ibm.ws.logging.internal.osgi;
 
 import java.lang.instrument.Instrumentation;
+import java.util.Map;
 
 import org.eclipse.equinox.log.ExtendedLogReaderService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogReaderService;
 
+import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TrConfigurator;
 import com.ibm.websphere.ras.TraceComponent;
 import com.ibm.websphere.ras.TraceComponentChangeListener;
@@ -44,12 +47,18 @@ public class Activator implements BundleActivator {
 
     private static TraceComponentChangeListenerTracker listenerTracker = null;
 
+    protected void activate(ComponentContext cc, Map<String, Object> configuration) {
+    		System.out.println("In OSGI activate!");
+    }
+    
     /**
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      * @see com.ibm.liberty.kernel.internal.Activator#start(org.osgi.framework.BundleContext)
      */
     @Override
     public void start(BundleContext context) throws Exception {
+    	
+         
         // Instrumentation, when available, is registered by the launcher
         // and will never go away.
         ServiceReference<Instrumentation> instReference = context.getServiceReference(Instrumentation.class);

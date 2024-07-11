@@ -20,6 +20,14 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
+import org.apache.commons.lang3.concurrent.LazyInitializer;
+import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.config.ConfigProvider;
+import org.eclipse.microprofile.config.spi.ConfigSource;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
 import com.ibm.ws.container.service.app.deploy.ApplicationInfo;
@@ -31,14 +39,6 @@ import com.ibm.ws.runtime.metadata.ApplicationMetaData;
 import com.ibm.ws.runtime.metadata.ComponentMetaData;
 import com.ibm.ws.runtime.metadata.MetaDataSlot;
 import com.ibm.ws.threadContext.ComponentMetaDataAccessorImpl;
-
-import org.apache.commons.lang3.concurrent.LazyInitializer;
-import org.eclipse.microprofile.config.Config;
-import org.eclipse.microprofile.config.ConfigProvider;
-import org.eclipse.microprofile.config.spi.ConfigSource;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import io.openliberty.microprofile.telemetry.internal.common.AgentDetection;
 import io.openliberty.microprofile.telemetry.internal.common.constants.OpenTelemetryConstants;
@@ -243,6 +243,9 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
                 }
             }
 
+            if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
+                Tr.debug(tc, "App OTEL instance is being configured with the properties: {0}", telemetryProperties);
+            }
             return telemetryProperties;
         } catch (Exception e) {
             Tr.error(tc, Tr.formatMessage(tc, "CWMOT5002.telemetry.error", e));
@@ -345,7 +348,7 @@ public class OpenTelemetryInfoFactoryImpl implements ApplicationStateListener, O
         if (otelMap.get(OpenTelemetryConstants.OTEL_RUNTIME_INSTANCE_NAME) != null) {
             return;
         }
-        
+
         ExtendedApplicationInfo extAppInfo = (ExtendedApplicationInfo) appInfo;
         OpenTelemetryInfoReference oTelRef = (OpenTelemetryInfoReference) extAppInfo.getMetaData().getMetaData(slotForOpenTelemetryInfoHolder);
 

@@ -156,12 +156,42 @@ public class LogRecordContext {
          * @return String value of this extension
          */
         String getValue();
+
+
+	
+    }
+    
+    public interface ExtensionMetaData {
+        /**
+         * Returns current value of this extension.
+         * 
+         * @return String value of this extension
+         */
+        Object getValue();
+
+		
+
+	
+    }
+    
+    public interface metadataExtension {
+        /**
+         * Returns current value of this extension.
+         * 
+         * @return String value of this extension
+         */
+        Object getMetaData();
+
+	
     }
 
     private final static ThreadLocal<HashMap<String, String>> extensions = new ThreadLocal<HashMap<String, String>>();
 
     /* Map of registered extension */
     private final static Map<String, WeakReference<Extension>> extensionMap = new HashMap<String, WeakReference<Extension>>();
+    private final static Map<String, WeakReference<ExtensionMetaData>> extensionMetaMap = new HashMap<String, WeakReference<ExtensionMetaData>>();
+
+
     private final static ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
     private final static Lock r = rwl.readLock();
     private final static Lock w = rwl.writeLock();
@@ -173,11 +203,40 @@ public class LogRecordContext {
         public String getValue() {
             return Thread.currentThread().getName();
         }
+
+
+
+		
+    };
+    
+    private final static ExtensionMetaData METADATA_EXTENSION = new ExtensionMetaData() {
+        @Override
+        public Object getValue() {
+            return Thread.currentThread().getName();
+        }
+
+	
+
+
+		
+    };
+    
+    private final static metadataExtension THREAD_METADATA_EXTENSION = new metadataExtension() {
+
+		@Override
+		public Object getMetaData() {
+			// TODO Auto-generated method stub
+			return Thread.currentThread().getName();
+		}
     };
 
     static {
         extensionMap.put(PTHREADID, new WeakReference<Extension>(
                         THREAD_NAME_EXTENSION));
+        
+        extensionMetaMap.put(PTHREADID, new WeakReference<ExtensionMetaData>(
+        		METADATA_EXTENSION));
+
     }
 
     /**
@@ -257,6 +316,24 @@ public class LogRecordContext {
         }
     }
 
+    public static void registerExtension(String key, ExtensionMetaData extension) {
+        if (key == null || extension == null) {
+            throw new IllegalArgumentException(
+                            "Neither 'key' nor 'extension' parameter can be null.");
+        }
+        w.lock();
+        try {
+            if (extensionMetaMap.containsKey(key)) {
+                throw new IllegalArgumentException("Extension with the key "
+                                                   + key + " is registered already");
+            }
+            extensionMetaMap.put(key, new WeakReference<ExtensionMetaData>(extension));
+        } finally {
+            w.unlock();
+        }
+    }
+
+    
     /**
      * Removes context extension registration.
      * 
@@ -274,6 +351,19 @@ public class LogRecordContext {
         w.lock();
         try {
             return extensionMap.remove(key) != null;
+        } finally {
+            w.unlock();
+        }
+    }
+    
+    public static boolean unregisterMetaExtension(String key) {
+        if (key == null) {
+            throw new IllegalArgumentException(
+                            "Parameter 'key' can not be null");
+        }
+        w.lock();
+        try {
+            return extensionMetaMap.remove(key) != null;
         } finally {
             w.unlock();
         }
@@ -342,5 +432,64 @@ public class LogRecordContext {
         }
 
     }
+    /**
+     * Retrieves metadata for all registered context extensions.
+     * 
+     * @param map
+     *            {@link Map} instance to populate with key-value pairs of the
+     *            context extensions.
+     * @throws IllegalArgumentException
+     *             if parameter <code>map</code> is <code>null</code>
+     */
+    public static void getMetaExtensions(Map<String, Object> map)
+                    throws IllegalArgumentException {
+        if (map == null) {
+            throw new IllegalArgumentException(
+                            "Parameter 'map' can not be null.");
+        }
+        if (recursion.get() == Boolean.TRUE) {
+            return;
+        }
+        recursion.set(Boolean.TRUE);
+        LinkedList<String> cleanup = new LinkedList<String>();
+        r.lock();
+        try {
+            for (Map.Entry<String, WeakReference<ExtensionMetaData>> entry : extensionMetaMap
+                            .entrySet()) {
+                ExtensionMetaData extension = entry.getValue().get();
+                if (extension == null) {
+                    cleanup.add(entry.getKey());
+                } else {
+                    Object value = extension.getValue();
+                    if (value != null) {
+                        map.put(entry.getKey(), value);
+                    }
+                }
+            }
+        } finally {
+            r.unlock();
+            recursion.remove();
+        }
+        if (cleanup.size() > 0) {
+            w.lock();
+            try {
+                for (String key : cleanup) {
+                    WeakReference<ExtensionMetaData> extension = extensionMetaMap
+                                    .remove(key);
+                    if (extension != null && extension.get() != null) {
+                        // Special case! Somebody has put new extension for this
+                        // key after we released
+                        // read lock and before we took write lock. We need to
+                        // put it back.
+                    	extensionMetaMap.put(key, extension);
+                    }
+                }
+            } finally {
+                w.unlock();
+            }
+        }
 
+    }
+
+ 
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -196,6 +196,7 @@ public class HandlerTest {
         json.add("loglevel");
         json.add("messageId");
         json.add("message");
+        json.add("appName");
 
         List<String> lines = MsgServer.findStringsInFileInLibertyServerRoot("Received message event", TRACE_LOG);
         Log.info(c, testName, "----> Received message events.. : " + lines.size());
@@ -207,13 +208,36 @@ public class HandlerTest {
         boolean checkMsgID = false;
         boolean allLevels = false;
         boolean rawAllLevels = false;
+
+        boolean appNameFound = false;
+
+        if (lines.size() > 0) {
+            for (int i = 0; i < lines.size(); i++) {
+                if (lines.get(i).contains("appName")) {
+                    Log.info(c, testName, "Found appName!! " + lines.get(i));
+                    appNameFound = true;
+                }
+
+            }
+
+        }
+
         if (lines.size() > 0) {
             String line = lines.get(0);
             Log.info(c, testName, "----> Message Event : " + line);
+            if (line.contains("appName")) {
+                Log.info(c, testName, "Found appName! " + line);
+                appNameFound = true;
+            }
+
             for (String field : json) {
                 if (!line.contains(field)) {
-                    fail(field + " missing..");
+                    if (field != "appName")
+                        fail(field + " missing..");
                 }
+
+                if (line.contains("appName"))
+                    appNameFound = true;
             }
 
             List<String> levels = new ArrayList<String>();
@@ -336,6 +360,8 @@ public class HandlerTest {
         }
 
         assertTrue("Could not find some of the log levels", allLevels);
+
+        assertTrue("Could not find appName!", appNameFound);
 
         assertTrue("whether all types of loggerName(rawLoggerName) values have been found ?", rawAllLevels);
         Log.info(c, testName, "********** Message Events received as expected ***********");

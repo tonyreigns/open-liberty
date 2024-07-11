@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -50,7 +50,8 @@ public class AccessLogData extends GenericData {
                                                 LogFieldConstants.IBM_REQUESTFIRSTLINE,
                                                 LogFieldConstants.IBM_ACCESSLOGDATETIME,
                                                 LogFieldConstants.IBM_REMOTEUSERID,
-                                                LogFieldConstants.IBM_REMOTEPORT
+                                                LogFieldConstants.IBM_REMOTEPORT,
+                                                LogFieldConstants.APPNAME
 
     };
 
@@ -172,6 +173,7 @@ public class AccessLogData extends GenericData {
     public void setAccessLogDatetime(long l)   { setPair(21, l); }
     public void setRemoteUser(String s)        { setPair(22, s); }
     public void setRemotePort(String s)        { setPair(23, s); }
+    public void setAppName(String s)           { setPair(28, s); }
     public void setCookies(String name, String value) {
         kvplCookies.addKeyValuePair(name, value);
         setPair(16, kvplCookies);
@@ -209,6 +211,7 @@ public class AccessLogData extends GenericData {
     public long getAccessLogDatetime()           { return getLongValue(21); }
     public String getRemoteUser()                { return getStringValue(22); }
     public String getRemotePort()                { return getStringValue(23); }
+    public String getAppName()                   { return getStringValue(28); }
 
     public static String getRequestStartTimeKey(int format)   { return nameAliases[format].aliases[0]; }
     public static String getUriPathKey(int format)            { return nameAliases[format].aliases[1]; }

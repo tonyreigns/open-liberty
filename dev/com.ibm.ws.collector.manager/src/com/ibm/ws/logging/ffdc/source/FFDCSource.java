@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -14,13 +14,16 @@ package com.ibm.ws.logging.ffdc.source;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.ibm.websphere.logging.hpel.LogRecordContext;
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
 import com.ibm.ws.ffdc.FFDC;
 import com.ibm.ws.logging.data.FFDCData;
+import com.ibm.ws.runtime.metadata.ComponentMetaData;
 import com.ibm.wsspi.collector.manager.BufferManager;
 import com.ibm.wsspi.collector.manager.Source;
 import com.ibm.wsspi.logging.Incident;
@@ -120,7 +123,24 @@ public class FFDCSource implements Source {
 
                 FFDCData ffdcData = new FFDCData();
 
+                Map<String, Object> extMap = new HashMap<>();
+
+                LogRecordContext.getMetaExtensions(extMap);
+
+                String appName = null;
+                for (String key : extMap.keySet()) {
+
+                    if (!key.equals("thread")) {
+                        System.out.println("FFDC LogRecordConext ------------------ " + key + " -- " + ((ComponentMetaData) extMap.get(key)).getJ2EEName().getApplication());
+                        appName = ((ComponentMetaData) extMap.get(key)).getJ2EEName().getApplication();
+
+                    }
+                }
+
+                //String appName = extMap.getOrDefault("appName", "null");
+
                 long timeStampVal = in.getTimeStamp();
+                ffdcData.setAppName(appName);
                 ffdcData.setDatetime(timeStampVal);
                 ffdcData.setMessage(th.getMessage());
                 ffdcData.setClassName(in.getSourceId());

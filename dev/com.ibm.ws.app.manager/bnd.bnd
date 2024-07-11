@@ -23,6 +23,8 @@ Include-Resource: \
   OSGI-INF/metatype=resources/OSGI-INF/metatype, \
   OSGI-INF=resources/OSGI-INF
 
+
+                
 Export-Package: \
   com.ibm.websphere.application, \
   com.ibm.wsspi.application, \
@@ -59,7 +61,8 @@ instrument.classesExcludes: com/ibm/ws/app/manager/internal/resources/*.class
 	com.ibm.ws.container.service;version=latest,\
 	com.ibm.ws.org.osgi.annotation.versioning;version=latest,\
 	com.ibm.ws.kernel.boot.common;version=latest,\
-	com.ibm.ws.kernel.feature.core;version=latest
+	com.ibm.ws.kernel.feature.core;version=latest,\
+	com.ibm.ws.logging.osgi
 
 -testpath: \
 	org.jmock:jmock;strategy=exact;version=2.5.1, \

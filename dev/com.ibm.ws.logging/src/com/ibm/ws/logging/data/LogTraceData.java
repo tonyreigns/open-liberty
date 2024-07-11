@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -27,6 +27,8 @@ public class LogTraceData extends GenericData {
 
     static Pattern messagePattern;
     private long rawSequenceNumber = -1;
+
+    private Object metaData = null;
 
     static {
         messagePattern = Pattern.compile("^([A-Z][\\dA-Z]{3,4})(\\d{4})([A-Z])(:)");
@@ -58,7 +60,9 @@ public class LogTraceData extends GenericData {
                                                 LogFieldConstants.IBM_USERDIR,
                                                 LogFieldConstants.IBM_SERVERNAME,
                                                 LogFieldConstants.TYPE,
-                                                LogFieldConstants.IBM_EXCEPTIONNAME
+                                                LogFieldConstants.IBM_EXCEPTIONNAME,
+                                                LogFieldConstants.APPNAME,
+                                                LogFieldConstants.METADATA
     };
 
     private final static String[] NAMES_LC = {
@@ -218,6 +222,8 @@ public class LogTraceData extends GenericData {
     public void setExtensions(KeyValuePairList kvps) { setPair(19, kvps); }
     public void setObjectId(int i)                   { setPair(20, i);    }
     public void setExceptionName(String s)           { setPair(25, s);    }
+    @Override
+    public void setAppName(String s)                 { setPair(26, s);    }
     //@formatter:on
 
     public static String getDatetimeKey(int format, boolean isMessageEvent) {
@@ -379,6 +385,8 @@ public class LogTraceData extends GenericData {
     public KeyValuePairList getExtensions() { return getValues(19);      }
     public int getObjectId()                { return getIntValue(20);    }
     public String getExceptionName()        { return getStringValue(25);    }
+    @Override
+    public String getAppName()              { return getStringValue(26);    }
     //@formatter:on
 
     public void setRawSequenceNumber(long l) {
@@ -398,6 +406,20 @@ public class LogTraceData extends GenericData {
         if (matcher.find())
             messageId = msg.substring(matcher.start(), matcher.end() - 1);
         return messageId;
+    }
+
+    /**
+     * @param metaData
+     */
+    public void setMetaData(Object metaData) {
+        this.metaData = metaData;
+    }
+
+    /**
+     * @param metaData
+     */
+    public Object getMetaData() {
+        return this.metaData;
     }
 
 }

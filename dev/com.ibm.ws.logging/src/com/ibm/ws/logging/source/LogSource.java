@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -177,6 +177,19 @@ public class LogSource implements Source {
                     CollectorJsonHelpers.handleExtensions(extensions, entry.getKey(), entry.getValue());
                 }
             }
+
+            Map<String, Object> extMetaMap = new HashMap<String, Object>();
+            LogRecordContext.getMetaExtensions(extMetaMap);
+
+            Object metaData = extMetaMap.getOrDefault("metaData", "null");
+
+            String appName = extMap.getOrDefault("appName", "null");
+            logData.setAppName(appName);
+
+            logData.setMetaData(metaData);
+
+            // System.out.println("LogSource Thread: " + Thread.currentThread().getName());
+
         }
 
         logData.setRawSequenceNumber(sequenceNumber.getRawSequenceNumber());

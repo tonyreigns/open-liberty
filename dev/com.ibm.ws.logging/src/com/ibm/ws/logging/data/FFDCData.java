@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -20,6 +20,8 @@ import com.ibm.ws.logging.collector.LogFieldConstants;
  *
  */
 public class FFDCData extends GenericData {
+
+    private String appName;
 
     public FFDCData() {
         super(13);
@@ -78,6 +80,11 @@ public class FFDCData extends GenericData {
         setPair(index, NAMES_JSON[index], l);
     }
 
+    public void setAppName(String appName) {
+        this.appName = appName;
+
+    }
+
     //@formatter:off
     public void setDatetime(long l)             { setPair(0, l); }
     public void setMessage(String s)            { setPair(1, s); }
@@ -98,6 +105,7 @@ public class FFDCData extends GenericData {
     public String getStacktrace()         { return getStringValue(6); }
     public String getObjectDetails()      { return getStringValue(7); }
     public String getSequence()           { return getStringValue(8); }
+    public String getAppName()            { return appName; }
 
     public static String getDatetimeKey(int format)             { return nameAliases[format].aliases[0]; }
     public static String getMessageKey(int format)              { return nameAliases[format].aliases[1]; }
@@ -112,5 +120,6 @@ public class FFDCData extends GenericData {
     public static String getUserDirKey(int format)              { return nameAliases[format].aliases[10]; }
     public static String getServerNameKey(int format)           { return nameAliases[format].aliases[11]; }
     public static String getTypeKey(int format)                 { return nameAliases[format].aliases[12]; }
+
 
 }
