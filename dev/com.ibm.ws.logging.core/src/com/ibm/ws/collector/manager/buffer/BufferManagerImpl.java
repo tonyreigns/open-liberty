@@ -43,7 +43,7 @@ public class BufferManagerImpl extends BufferManager {
 	private static final int EARLY_MESSAGE_QUEUE_SIZE = 400;
 	
 	public BufferManagerImpl(int capacity, String sourceId) {
-		this(capacity,sourceId, true);
+		this(capacity,sourceId, false);
 	}
 
 	public BufferManagerImpl(int capacity, String sourceId, boolean isSoftRefEMQ) {
@@ -83,6 +83,8 @@ public class BufferManagerImpl extends BufferManager {
 				// Must check again - could have been removed
 				if (earlyMessageQueue != null) {
 					earlyMessageQueue.add(event);
+					//.out.println("BufferMgrImpl add(): " + event.toString());
+
 				}
 
 				// If async handler added before this synchronized block, need
@@ -226,6 +228,8 @@ public class BufferManagerImpl extends BufferManager {
 			for (Object message : earlyMessageQueue.toArray()) {
 				if (message != null){
 					syncHandler.synchronousWrite(message);
+					
+					//System.out.println("addSyncHandler: " + message);
 				}
 			}
 		}

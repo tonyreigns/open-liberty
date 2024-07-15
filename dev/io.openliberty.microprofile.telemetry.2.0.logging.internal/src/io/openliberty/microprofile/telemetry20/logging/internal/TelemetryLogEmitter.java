@@ -25,11 +25,12 @@ import io.opentelemetry.api.logs.LogRecordBuilder;
  * to the relevant end point, which would be the configured log exporter for MicroProfile Telemetry.
  */
 public class TelemetryLogEmitter implements Target {
-    
+
     private static final TraceComponent tc = Tr.register(TelemetryLogEmitter.class);
-    
+
     @Override
     public void sendEvents(List<Object> formattedEvents) {
+        System.out.println("Send events!");
         //Called by EventsBuffer to emit the formatted log events
         for (Object builder : formattedEvents) {
             if (builder instanceof LogRecordBuilder) {
@@ -40,7 +41,7 @@ public class TelemetryLogEmitter implements Target {
             }
         }
     }
-    
+
     @Override
     public void close() {
     }

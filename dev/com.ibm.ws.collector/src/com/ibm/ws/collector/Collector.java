@@ -79,6 +79,7 @@ public abstract class Collector implements Handler, Formatter {
         //Process the configuration, initialize the events buffer and start it.
         try {
             //Process and update the configuration
+            System.out.println("Configurtion being set! " + configuration);
             configure(configuration);
         } catch (IOException e) {
             //FFDC
