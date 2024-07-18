@@ -26,5 +26,5 @@ public interface HTTPMetricAdapter {
 	 * @param duration
 	 * @param appName This value can be `null` to indicate that we're updating metrics relating to the server. Not all Implementations may need the appname value.
 	 */
-	public void updateHttpMetrics(HttpStatAttributes httpStatAttributes, Duration duration, String appName);
+	public void updateHttpMetrics(HttpStatAttributes httpStatAttributes, Duration duration);
 }

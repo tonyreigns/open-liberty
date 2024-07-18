@@ -69,7 +69,7 @@ public class MetricsManager {
      * @param appName The appName, can be null to indicate server context
      */
 	public void updateHttpMetrics(HttpStatAttributes httpStatAttributes, Duration duration, String appName) {
-		httpMetricRuntimes.stream().forEach(adapters -> adapters.updateHttpMetrics(httpStatAttributes,duration,appName));	
+		httpMetricRuntimes.stream().forEach(adapters -> adapters.updateHttpMetrics(httpStatAttributes,duration));	
 	}
 	
 

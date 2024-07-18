@@ -43,8 +43,8 @@ import com.ibm.wsspi.collector.manager.Handler;
 import com.ibm.wsspi.collector.manager.SynchronousHandler;
 
 import io.openliberty.microprofile.telemetry.internal.common.constants.OpenTelemetryConstants;
+import io.openliberty.microprofile.telemetry.internal.common.info.OpenTelemetryInfo;
 import io.openliberty.microprofile.telemetry.internal.interfaces.OpenTelemetryAccessor;
-import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.logs.LogRecordBuilder;
@@ -66,9 +66,9 @@ public class OpenTelemetryLogHandler implements SynchronousHandler, Formatter {
 
     protected final int MAXFIELDLENGTH = -1; //Unlimited field length
 
-    List<String> sourcesList = new ArrayList<String>();
+    private OpenTelemetryInfo openTelemetry;
 
-    private OpenTelemetry openTelemetry;
+    private List<String> sourcesList = new ArrayList<String>();
 
     @Activate
     protected void activate(ComponentContext cc, Map<String, Object> configuration) {
@@ -76,8 +76,7 @@ public class OpenTelemetryLogHandler implements SynchronousHandler, Formatter {
             Tr.debug(tc, "In activate()");
         }
 
-        // Get the OpenTelemetry object instance
-        this.openTelemetry = OpenTelemetryAccessor.getOpenTelemetryInfo("io.openliberty.microprofile.telemetry.runtime").getOpenTelemetry();
+        this.openTelemetry = OpenTelemetryAccessor.getOpenTelemetryInfo();
 
         // Validate the configured sources
         validateSources(configuration);
@@ -221,7 +220,6 @@ public class OpenTelemetryLogHandler implements SynchronousHandler, Formatter {
             // Get Attributes builder to add additional Log fields
             AttributesBuilder attributes = Attributes.builder();
 
-            OpenTelemetry otelInstance = null;
             // Get Extensions (LogRecordContext) from LogData and add it as attributes.
             ArrayList<KeyValuePair> extensions = null;
             KeyValuePairList kvpl = null;
@@ -242,23 +240,20 @@ public class OpenTelemetryLogHandler implements SynchronousHandler, Formatter {
                         } else {
                             attributes.put(extKey, k.getStringValue());
                         }
-
-                        if (extKey.equals("ext_appName")) {
-                            String appName = k.getStringValue();
-                            if (!appName.contains("io.openliberty") && !appName.contains("com.ibm.ws")) {
-                                otelInstance = OpenTelemetryAccessor.getOpenTelemetryInfo(appName).getOpenTelemetry();
-                            }
-                        }
                     }
                 }
             }
 
-            if (otelInstance == null) {
-                otelInstance = this.openTelemetry;
+            OpenTelemetryInfo otelInstance = null;
+
+            if (OpenTelemetryAccessor.isRuntimeEnabled()) {
+                otelInstance = openTelemetry;
+            } else {
+                otelInstance = OpenTelemetryAccessor.getOpenTelemetryInfo();
             }
 
-            if (otelInstance != null) {
-                builder = otelInstance.getLogsBridge().loggerBuilder(OpenTelemetryConstants.INSTRUMENTATION_NAME).build().logRecordBuilder();
+            if (otelInstance != null && otelInstance.getEnabled()) {
+                builder = otelInstance.getOpenTelemetry().getLogsBridge().loggerBuilder(OpenTelemetryConstants.INSTRUMENTATION_NAME).build().logRecordBuilder();
             }
 
             if (builder != null)
