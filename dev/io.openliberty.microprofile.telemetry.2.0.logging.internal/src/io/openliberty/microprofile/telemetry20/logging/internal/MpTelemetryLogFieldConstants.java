@@ -12,7 +12,7 @@ package io.openliberty.microprofile.telemetry20.logging.internal;
 /**
  * This class contains the transformed Liberty event field names to match OpenTelemetry Log Attributes naming convention.
  */
-public class TelemetryLogFieldConstants {
+public class MpTelemetryLogFieldConstants {
 
     //Common Mapped OTel Attribute Log fields
     public static final String IBM_TYPE = "com.ibm.type";
@@ -32,10 +32,13 @@ public class TelemetryLogFieldConstants {
     public static final String IBM_OBJECTDETAILS = "com.ibm.object_details";
 
     //Mapped OTel Attribute Liberty LogRecordContext Extension fields
-    public static final String EXT_APP_NAME = "com.ibm.ext.app_name";
+    public static final String IBM_EXT_APP_NAME = "com.ibm.ext.app_name";
 
     // Miscellaneous
-    public static final String EXT_PREFIX = "ext_";
+    public static final String EXT_APPNAME = "ext_appName";
+    public static final String EXT_THREAD = "ext_thread";
+    public static final String COM_IBM_TAG = "com.ibm.";
+    public static final String COM_IBM_EXT_TAG = "com.ibm.ext.";
 
     // OpenTelemetry Scope Info field
     public static final String OTEL_SCOPE_INFO = "scopeInfo:";
