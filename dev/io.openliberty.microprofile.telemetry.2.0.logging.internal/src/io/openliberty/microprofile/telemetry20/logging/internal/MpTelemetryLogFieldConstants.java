@@ -12,30 +12,30 @@ package io.openliberty.microprofile.telemetry20.logging.internal;
 /**
  * This class contains the transformed Liberty event field names to match OpenTelemetry Log Attributes naming convention.
  */
-public class TelemetryLogFieldConstants {
+public class MpTelemetryLogFieldConstants {
 
     //Common Mapped OTel Attribute Log fields
-    public static final String IBM_TYPE = "com.ibm.type";
-    public static final String IBM_USERDIR = "com.ibm.user_dir";
-    public static final String IBM_SERVERNAME = "com.ibm.server_name";
-    public static final String IBM_SEQUENCE = "com.ibm.sequence";
-    public static final String IBM_CLASSNAME = "com.ibm.class_name";
+    public static final String LIBERTY_TYPE = "io.openliberty.type";
+    public static final String LIBERTY_SEQUENCE = "io.openliberty.sequence";
+    public static final String LIBERTY_CLASSNAME = "io.openliberty.class_name";
 
     //Mapped OTel Attribute Liberty message and trace log fields
-    public static final String IBM_MESSAGEID = "com.ibm.message_id";
-    public static final String IBM_MODULE = "com.ibm.module";
-    //public static final String LOGGERNAME = "loggerName";
-    public static final String IBM_METHODNAME = "com.ibm.method_name";
+    public static final String LIBERTY_MESSAGEID = "io.openliberty.message_id";
+    public static final String LIBERTY_MODULE = "io.openliberty.module";
+    public static final String LIBERTY_METHODNAME = "io.openliberty.method_name";
 
     //Mapped OTel Attribute Liberty FFDC log fields
-    public static final String IBM_PROBEID = "com.ibm.probe_id";
-    public static final String IBM_OBJECTDETAILS = "com.ibm.object_details";
+    public static final String LIBERTY_PROBEID = "io.openliberty.probe_id";
+    public static final String LIBERTY_OBJECTDETAILS = "io.openliberty.object_details";
 
     //Mapped OTel Attribute Liberty LogRecordContext Extension fields
-    public static final String EXT_APP_NAME = "com.ibm.ext.app_name";
+    public static final String LIBERTY_EXT_APP_NAME = "io.openliberty.ext.app_name";
 
     // Miscellaneous
-    public static final String EXT_PREFIX = "ext_";
+    public static final String EXT_APPNAME = "ext_appName";
+    public static final String EXT_THREAD = "ext_thread";
+    public static final String IO_OPENLIBERTY_TAG = "io.openliberty.";
+    public static final String IO_OPENLIBERTY_EXT_TAG = "io.openliberty.ext.";
 
     // OpenTelemetry Scope Info field
     public static final String OTEL_SCOPE_INFO = "scopeInfo:";
