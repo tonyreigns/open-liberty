@@ -54,12 +54,8 @@ public class MpTelemetryLogMappingUtils {
     /**
      * Map the log event data to the OpenTelemetry Logs Data Model Format.
      *
-     * @param event          The object originating from logging source which contains necessary fields
-     * @param eventType      The type of event
-     * @param serverName     The name of the server
-     * @param wlpUserDir     The name of wlp user directory
-     * @param serverHostName The name of server host
-     * @param maxFieldLength The max character length of strings
+     * @param event     The object originating from logging source which contains necessary fields
+     * @param eventType The type of event
      */
     public static void mapLibertyEventToOpenTelemetry(LogRecordBuilder builder, String eventType, Object event) {
         if (eventType.equals(CollectorConstants.MESSAGES_LOG_EVENT_TYPE)) {
@@ -74,13 +70,9 @@ public class MpTelemetryLogMappingUtils {
     /**
      * Maps the Message and Trace log events to the OpenTelemetry Logs Data Model.
      *
-     * @param builder
-     * @param wlpUserDir
-     * @param serverName
-     * @param serverHostName
-     * @param eventType
-     * @param event
-     * @return
+     * @param builder   The OpenTelemetry LogRecordBuilder, which is used to construct the LogRecord.
+     * @param eventType The object originating from logging source which contains necessary fields
+     * @param event     The type of event
      */
     private static void mapMessageAndTraceToOpenTelemetry(LogRecordBuilder builder, String eventType, Object event) {
         LogTraceData logData = (LogTraceData) event;
@@ -178,13 +170,9 @@ public class MpTelemetryLogMappingUtils {
     /**
      * Maps the FFDC log events to the OpenTelemetry Logs Data Model.
      *
-     * @param builder
-     * @param maxFieldLength
-     * @param wlpUserDir
-     * @param serverName
-     * @param serverHostName
-     * @param event
-     * @param eventType
+     * @param builder   The OpenTelemetry LogRecordBuilder, which is used to construct the LogRecord.
+     * @param eventType The object originating from logging source which contains necessary fields
+     * @param event     The type of event
      */
     private static void mapFFDCToOpenTelemetry(LogRecordBuilder builder, String eventType, Object event) {
         FFDCData ffdcData = (FFDCData) event;
