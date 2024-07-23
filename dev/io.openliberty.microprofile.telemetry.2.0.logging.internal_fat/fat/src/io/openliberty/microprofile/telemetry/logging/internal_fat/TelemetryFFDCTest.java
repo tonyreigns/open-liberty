@@ -10,6 +10,7 @@
 package io.openliberty.microprofile.telemetry.logging.internal_fat;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -70,12 +71,12 @@ public class TelemetryFFDCTest extends FATServletClient {
     public void testTelemetryMessages() throws Exception {
         hitWebPage("ffdc-servlet", "FFDCServlet", true, "?generateFFDC=true");
 
-        String logLevelLine = server.waitForStringInLog("WARNING:", server.getConsoleLogFile());
+        String logLevelLine = server.waitForStringInLog(".*scopeInfo.*", server.getConsoleLogFile());
         String exceptionTraceLine = server.waitForStringInLog("exception.message=\"divide by zero\"", server.getConsoleLogFile());
         String exceptionMessageLine = server.waitForStringInLog("exception.stacktrace=\"java.lang.ArithmeticException: divide by zero", server.getConsoleLogFile());
         String exceptionTypeLine = server.waitForStringInLog("exception.type=\"java.lang.ArithmeticException\"", server.getConsoleLogFile());
 
-        assertNotNull("FFDC Log levelwas not logged by MPTelemetry", logLevelLine);
+        assertTrue("FFDC Log levelwas not logged by MPTelemetry", logLevelLine.contains("WARN "));
         assertNotNull("FFDC Exception.message was not logged by MPTelemetry", exceptionMessageLine);
         assertNotNull("FFDC Exception.stacktrace was not logged by MPTelemetry", exceptionTraceLine);
         assertNotNull("FFDC Exception.type was not logged by MPTelemetry", exceptionTypeLine);
