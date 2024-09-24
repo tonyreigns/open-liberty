@@ -19,6 +19,7 @@ import com.ibm.websphere.ras.annotation.Trivial;
 import com.ibm.ws.logging.collector.CollectorConstants;
 import com.ibm.ws.logging.collector.CollectorJsonHelpers;
 import com.ibm.ws.logging.collector.LogFieldConstants;
+import com.ibm.ws.logging.data.AccessLogData;
 import com.ibm.ws.logging.data.FFDCData;
 import com.ibm.ws.logging.data.KeyValuePair;
 import com.ibm.ws.logging.data.KeyValuePairList;
@@ -52,6 +53,8 @@ public class MpTelemetryLogMappingUtils {
             return CollectorConstants.TRACE_LOG_EVENT_TYPE;
         } else if (source.endsWith(CollectorConstants.FFDC_SOURCE)) {
             return CollectorConstants.FFDC_EVENT_TYPE;
+        } else if (source.endsWith(CollectorConstants.ACCESS_LOG_SOURCE)) {
+            return CollectorConstants.ACCESS_LOG_EVENT_TYPE;
         } else
             return "";
     }
@@ -69,6 +72,8 @@ public class MpTelemetryLogMappingUtils {
             mapMessageAndTraceToOpenTelemetry(builder, eventType, event);
         } else if (eventType.equals(CollectorConstants.FFDC_EVENT_TYPE)) {
             mapFFDCToOpenTelemetry(builder, eventType, event);
+        } else if (eventType.equals(CollectorConstants.ACCESS_LOG_EVENT_TYPE)) {
+            mapAccessToOpenTelemetry(builder, eventType, event);
         }
     }
 
@@ -214,6 +219,63 @@ public class MpTelemetryLogMappingUtils {
                         .put(MpTelemetryLogFieldConstants.LIBERTY_OBJECTDETAILS, ffdcData.getObjectDetails())
                         .put(MpTelemetryLogFieldConstants.LIBERTY_CLASSNAME, ffdcData.getClassName())
                         .put(MpTelemetryLogFieldConstants.LIBERTY_SEQUENCE, ffdcData.getSequence());
+
+        // Set the Attributes to the builder.
+        builder.setAllAttributes(attributes.build());
+
+        // Set the Span and Trace IDs from the current context.
+        builder.setContext(Context.current());
+    }
+
+    /**
+     * Maps the FFDC log events to the OpenTelemetry Logs Data Model.
+     *
+     * @param builder   The OpenTelemetry LogRecordBuilder, which is used to construct the LogRecord.
+     * @param eventType The object originating from logging source which contains necessary fields
+     * @param event     The type of event
+     */
+    private static void mapAccessToOpenTelemetry(LogRecordBuilder builder, String eventType, Object event) {
+        AccessLogData ffdcData = (AccessLogData) event;
+        // Get Timestamp from LogData and set it in the LogRecordBuilder
+        builder.setTimestamp(ffdcData.getDatetime(), TimeUnit.MILLISECONDS);
+
+        // Set FFDC log level to WARNING in the LogRecordBuilder
+        builder.setSeverity(Severity.INFO); //###Which severity?
+
+        // Set the body to the exception message
+        String ffdcMsg = ffdcData.getJsonMessage(); //####???
+        if (ffdcMsg != null) {
+            builder.setBody(ffdcMsg);
+        }
+
+        // Get Attributes builder to add additional Log fields
+        AttributesBuilder attributes = Attributes.builder();
+
+        // Add Thread information to Attributes Builder
+
+        System.out.println("FFDC DATA: " + ffdcData);
+        // Add FFDC information to Semantic Convention Attributes
+        attributes.put(SemanticAttributes.NET_PEER_IP, ffdcData.getRemoteIP());
+        attributes.put(SemanticAttributes.NET_PEER_NAME, ffdcData.getRemoteHost());
+        if (ffdcData.getRemotePort() != null)
+            attributes.put(SemanticAttributes.NET_PEER_PORT, Integer.valueOf(ffdcData.getRemotePort()));
+
+        attributes.put(SemanticAttributes.HTTP_TARGET, ffdcData.getRequestHost());
+        attributes.put("NEW_REQUEST_PORT", ffdcData.getRequestPort()); //Need var name
+        attributes.put(SemanticAttributes.HTTP_URL, ffdcData.getRequestHost() + ":" + ffdcData.getRequestPort()); //Should be full request URL. Use uripath, query string. in form scheme:  scheme://host[:port]/path?query[#fragment].
+        attributes.put(SemanticAttributes.HTTP_SCHEME, ffdcData.getRequestProtocol()); //Returns HTTP/1.1 but should it just be HTTP?
+        attributes.put(SemanticAttributes.NET_PEER_NAME, ffdcData.getRemoteHost());
+
+        attributes.put(SemanticAttributes.HTTP_METHOD, ffdcData.getRequestMethod());
+
+        attributes.put(MpTelemetryLogFieldConstants.LIBERTY_SEQUENCE, ffdcData.getSequence());
+
+//        // Add additional log information from FFDCData to Attributes Builder
+//        attributes.put(MpTelemetryLogFieldConstants.LIBERTY_TYPE, eventType)
+//                        .put(MpTelemetryLogFieldConstants.LIBERTY_PROBEID, ffdcData.getProbeId())
+//                        .put(MpTelemetryLogFieldConstants.LIBERTY_OBJECTDETAILS, ffdcData.getObjectDetails())
+//                        .put(MpTelemetryLogFieldConstants.LIBERTY_CLASSNAME, ffdcData.getClassName())
+//                        .put(MpTelemetryLogFieldConstants.LIBERTY_SEQUENCE, ffdcData.getSequence());
 
         // Set the Attributes to the builder.
         builder.setAllAttributes(attributes.build());

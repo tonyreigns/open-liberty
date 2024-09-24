@@ -301,6 +301,8 @@ public class OpenTelemetryLogHandler implements SynchronousHandler {
             return CollectorConstants.TRACE_SOURCE;
         else if (source.equals(CollectorConstants.FFDC_CONFIG_VAL))
             return CollectorConstants.FFDC_SOURCE;
+        else if (source.equals(CollectorConstants.ACCESS_CONFIG_VAL))
+            return CollectorConstants.ACCESS_LOG_SOURCE;
 
         return "";
     }
@@ -318,6 +320,8 @@ public class OpenTelemetryLogHandler implements SynchronousHandler {
             return CollectorConstants.TRACE_SOURCE;
         } else if (sourceName.equals(CollectorConstants.FFDC_SOURCE)) {
             return CollectorConstants.FFDC_SOURCE;
+        } else if (sourceName.equals(CollectorConstants.ACCESS_LOG_SOURCE)) {
+            return CollectorConstants.ACCESS_LOG_SOURCE;
         } else {
             return "";
         }
