@@ -10,6 +10,8 @@
 package io.openliberty.microprofile.telemetry20.logging.internal;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.ibm.websphere.logging.WsLevel;
@@ -20,8 +22,10 @@ import com.ibm.ws.logging.collector.CollectorConstants;
 import com.ibm.ws.logging.collector.CollectorJsonHelpers;
 import com.ibm.ws.logging.collector.LogFieldConstants;
 import com.ibm.ws.logging.data.AccessLogData;
+import com.ibm.ws.logging.data.AccessLogDataFormatter;
 import com.ibm.ws.logging.data.FFDCData;
 import com.ibm.ws.logging.data.KeyValuePair;
+import com.ibm.ws.logging.data.KeyValuePair.ValueTypes;
 import com.ibm.ws.logging.data.KeyValuePairList;
 import com.ibm.ws.logging.data.LogTraceData;
 
@@ -235,53 +239,75 @@ public class MpTelemetryLogMappingUtils {
      * @param event     The type of event
      */
     private static void mapAccessToOpenTelemetry(LogRecordBuilder builder, String eventType, Object event) {
-        AccessLogData ffdcData = (AccessLogData) event;
+        AccessLogData accessLogData = (AccessLogData) event;
         // Get Timestamp from LogData and set it in the LogRecordBuilder
-        builder.setTimestamp(ffdcData.getDatetime(), TimeUnit.MILLISECONDS);
+        builder.setTimestamp(accessLogData.getDatetime(), TimeUnit.MILLISECONDS);
 
-        // Set FFDC log level to WARNING in the LogRecordBuilder
-        builder.setSeverity(Severity.INFO); //###Which severity?
-
-        // Set the body to the exception message
-        String ffdcMsg = ffdcData.getJsonMessage(); //####???
-        if (ffdcMsg != null) {
-            builder.setBody(ffdcMsg);
-        }
+        builder.setSeverity(Severity.INFO);
 
         // Get Attributes builder to add additional Log fields
         AttributesBuilder attributes = Attributes.builder();
 
-        // Add Thread information to Attributes Builder
+        List<KeyValuePair> kvpList = new ArrayList<>();
 
-        System.out.println("FFDC DATA: " + ffdcData);
-        // Add FFDC information to Semantic Convention Attributes
-        attributes.put(SemanticAttributes.NET_PEER_IP, ffdcData.getRemoteIP());
-        attributes.put(SemanticAttributes.NET_PEER_NAME, ffdcData.getRemoteHost());
-        if (ffdcData.getRemotePort() != null)
-            attributes.put(SemanticAttributes.NET_PEER_PORT, Integer.valueOf(ffdcData.getRemotePort()));
+        AccessLogDataFormatter[] formatters = accessLogData.getFormatters();
 
-        attributes.put(SemanticAttributes.HTTP_TARGET, ffdcData.getRequestHost());
-        attributes.put("NEW_REQUEST_PORT", ffdcData.getRequestPort()); //Need var name
-        attributes.put(SemanticAttributes.HTTP_URL, ffdcData.getRequestHost() + ":" + ffdcData.getRequestPort()); //Should be full request URL. Use uripath, query string. in form scheme:  scheme://host[:port]/path?query[#fragment].
-        attributes.put(SemanticAttributes.HTTP_SCHEME, ffdcData.getRequestProtocol()); //Returns HTTP/1.1 but should it just be HTTP?
-        attributes.put(SemanticAttributes.NET_PEER_NAME, ffdcData.getRemoteHost());
+        if (formatters[4] != null) {
+            formatters[4].populate(kvpList, accessLogData);
+        } else if (formatters[5] != null) {
+            formatters[5].populate(kvpList, accessLogData);
+        }
 
-        attributes.put(SemanticAttributes.HTTP_METHOD, ffdcData.getRequestMethod());
+        String key = null;
+        Object value = null;
+        for (Iterator<KeyValuePair> element = kvpList.iterator(); element.hasNext();) {
+            KeyValuePair next = element.next();
+            key = next.getKey();
+            value = getPairValue(next);
 
-        attributes.put(MpTelemetryLogFieldConstants.LIBERTY_SEQUENCE, ffdcData.getSequence());
+            String newKey = MpTelemetryAccessEventMappingUtils.getOTelMappedAccessEventKeyName(key);
 
-//        // Add additional log information from FFDCData to Attributes Builder
-//        attributes.put(MpTelemetryLogFieldConstants.LIBERTY_TYPE, eventType)
-//                        .put(MpTelemetryLogFieldConstants.LIBERTY_PROBEID, ffdcData.getProbeId())
-//                        .put(MpTelemetryLogFieldConstants.LIBERTY_OBJECTDETAILS, ffdcData.getObjectDetails())
-//                        .put(MpTelemetryLogFieldConstants.LIBERTY_CLASSNAME, ffdcData.getClassName())
-//                        .put(MpTelemetryLogFieldConstants.LIBERTY_SEQUENCE, ffdcData.getSequence());
+            if (value != null) {
+                if (key.equals("requestProtocol")) {
+                    String[] requestProtocolSplit = value.toString().split("/");
+                    attributes.put(SemanticAttributes.NETWORK_PROTOCOL_NAME, requestProtocolSplit[0]);
+                    attributes.put(SemanticAttributes.NETWORK_PROTOCOL_VERSION, requestProtocolSplit[1]);
+                } else if (key.equals("datetime")) {
+                    continue;
+                } else if (key.contains("requestHeader") || key.contains("responseHeader")) {
+                    attributes.put(newKey, (String) value);
+                } else {
+                    if (value instanceof String)
+                        attributes.put(newKey, (String) value);
+                    else if (value instanceof Long)
+                        attributes.put(newKey, (Long) value);
+                    else if (value instanceof Integer)
+                        attributes.put(newKey, (Integer) value);
+                }
+            }
+        }
+
+        // Set the body to the request first line
+        String accessLogMsg = accessLogData.getRequestFirstLine();
+        if (accessLogMsg != null) {
+            builder.setBody(accessLogMsg);
+        } else {
+            // If the message field is null, set body to "Empty"
+            builder.setBody("Empty");
+        }
+
+        // Add additional log information from accessLogData to Attributes Builder
+        attributes.put(MpTelemetryLogFieldConstants.LIBERTY_TYPE, eventType);
+        attributes.put(LogFieldConstants.HOST, accessLogData.getRequestHost());
+
+        attributes.put(MpTelemetryLogFieldConstants.LIBERTY_SEQUENCE, accessLogData.getSequence());
 
         // Set the Attributes to the builder.
         builder.setAllAttributes(attributes.build());
 
         // Set the Span and Trace IDs from the current context.
         builder.setContext(Context.current());
+
     }
 
     /**
@@ -359,6 +385,20 @@ public class MpTelemetryLogMappingUtils {
             }
         }
         return sb.toString();
+    }
+
+    private static Object getPairValue(KeyValuePair value) {
+        ValueTypes pairValueType = value.getType();
+
+        if (pairValueType.equals(ValueTypes.STRING)) {
+            return value.getStringValue();
+        } else if (pairValueType.equals(ValueTypes.LONG)) {
+            return value.getLongValue();
+        } else if (pairValueType.equals(ValueTypes.INTEGER)) {
+            return value.getIntValue();
+        } else {
+            return value.getStringValue();
+        }
     }
 
 }

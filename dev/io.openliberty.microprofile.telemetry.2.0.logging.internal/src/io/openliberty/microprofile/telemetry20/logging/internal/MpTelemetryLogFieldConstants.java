@@ -39,4 +39,13 @@ public class MpTelemetryLogFieldConstants {
 
     // OpenTelemetry Scope Info field
     public static final String OTEL_SCOPE_INFO = "scopeInfo:";
+
+    public static final String ACCESS_TYPE_PREFIX_TAG = "access_log.";
+
+    public static final String OPENLIBERTY_ACCESS_PREFIX = IO_OPENLIBERTY_TAG + ACCESS_TYPE_PREFIX_TAG;
+
+    public static final String ACCESS_COOKIE_PREFIX = "cookie_";
+    public static final String ACCESS_RESPONSE_HEADER_PREFIX = "requestHeader_";
+    public static final String ACCESS_REQUEST_HEADER_PREFIX = "responseHeader_";
+
 }
