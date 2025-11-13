@@ -19,6 +19,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.AccessController;
@@ -85,6 +86,7 @@ import com.ibm.ws.logging.utils.FileLogHolder;
 import com.ibm.ws.logging.utils.RecursionCounter;
 import com.ibm.ws.logging.utils.SequenceNumber;
 import com.ibm.wsspi.collector.manager.SynchronousHandler;
+import com.ibm.wsspi.logging.Introspector;
 import com.ibm.wsspi.logging.LogHandler;
 import com.ibm.wsspi.logging.MessageRouter;
 import com.ibm.wsspi.logprovider.LogProviderConfig;
@@ -148,7 +150,7 @@ import io.openliberty.checkpoint.spi.CheckpointPhase;
  * <p>
  * Phew.
  */
-public class BaseTraceService implements TrService {
+public class BaseTraceService implements TrService, Introspector {
 
     protected boolean isCaptureSystemStreamsExecuted = false;
 
@@ -2545,4 +2547,26 @@ public class BaseTraceService implements TrService {
             return name.startsWith("ffdc_") && name.endsWith(".log");
         }
     };
+
+    @Override
+    public String getIntrospectorName() {
+        return "BaseTraceServiceIntrospector";
+    }
+
+    @Override
+    public String getIntrospectorDescription() {
+        return "List of logs being throttled.";
+    }
+
+    @Override
+    public void introspect(PrintWriter out) throws Exception {
+        out.println("~~~~~~~~~~~~~~~~~~~");
+
+        for (Map.Entry<String, ThrottleState> entry : throttleStates.entrySet()) {
+            out.println("Key being throttled: " + entry.getKey() + " -- Occurences over the last 5 minutes: " + entry.getValue() + " -- Last occurence: "
+                        + entry.getValue().getLastAccessTime());
+
+        }
+        out.println("~~~~~~~~~~~~~~~~~~~");
+    }
 }
