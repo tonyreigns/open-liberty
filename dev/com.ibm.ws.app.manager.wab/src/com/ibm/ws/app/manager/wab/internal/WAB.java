@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -15,7 +15,6 @@ package com.ibm.ws.app.manager.wab.internal;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.concurrent.Future;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.ServletContext;
@@ -37,7 +36,7 @@ import com.ibm.ws.app.manager.wab.internal.WABState.State;
 import com.ibm.ws.container.service.app.deploy.ApplicationInfo;
 import com.ibm.ws.container.service.app.deploy.extended.ModuleContainerInfo;
 import com.ibm.ws.ffdc.annotation.FFDCIgnore;
-import com.ibm.ws.kernel.productinfo.ProductInfo;
+//import com.ibm.ws.kernel.productinfo.ProductInfo;
 import com.ibm.wsspi.kernel.service.utils.FrameworkState;
 
 /**
@@ -260,15 +259,12 @@ class WAB implements BundleTrackerCustomizer<WAB> {
         if (rawVirtualHost == null)
             return null;
 
-        if (rawVirtualHost.startsWith("${")) {
-            String resolvedVirtHost = installer.resolveVariable(rawVirtualHost);
-            if (rawVirtualHost.equals(resolvedVirtHost)) {
-
         if (!isBeta()) {
             if (rawVirtualHost.equals(OPS_VIRTUAL_HOST) || rawVirtualHost.equals(ADMIN_VIRTUAL_HOST)) {
                 return null;
             }
         }
+
         if (rawVirtualHost.equals(OPS_VIRTUAL_HOST)) {
             if (installer.isVirtualHostValid(OPS_VIRTUAL_HOST)) {
                 return OPS_VIRTUAL_HOST;
@@ -284,6 +280,16 @@ class WAB implements BundleTrackerCustomizer<WAB> {
         } else {
             return null;
         }
+
+//        if (rawVirtualHost.startsWith("${")) {
+//            String resolvedVirtHost = installer.resolveVariable(rawVirtualHost);
+//            if (rawVirtualHost.equals(resolvedVirtHost)) {
+//                return null;
+//            } else
+//                return resolvedVirtHost;
+//        }
+//        return rawVirtualHost;
+
     }
 
     /**
@@ -705,18 +711,18 @@ class WAB implements BundleTrackerCustomizer<WAB> {
     }
 
     private boolean isBeta() {
-        try {
-            final Map<String, ProductInfo> productInfos = ProductInfo.getAllProductInfo();
-
-            for (ProductInfo info : productInfos.values()) {
-                if (EARLY_ACCESS.equals(info.getEdition())) {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            Tr.debug(tc, "Exception getting InstalledProductInfo: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return false;
+//        try {
+//            final Map<String, ProductInfo> productInfos = ProductInfo.getAllProductInfo();
+//
+//            for (ProductInfo info : productInfos.values()) {
+//                if (EARLY_ACCESS.equals(info.getEdition())) {
+//                    return true;
+//                }
+//            }
+//        } catch (Exception e) {
+//            Tr.debug(tc, "Exception getting InstalledProductInfo: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+        return true;
     }
 }
