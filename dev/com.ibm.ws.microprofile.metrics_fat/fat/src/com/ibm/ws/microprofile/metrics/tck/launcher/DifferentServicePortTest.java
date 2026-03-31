@@ -13,7 +13,6 @@ package com.ibm.ws.microprofile.metrics.tck.launcher;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +20,6 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
-import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -38,7 +36,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.ibm.websphere.simplicity.log.Log;
-import com.ibm.ws.kernel.productinfo.ProductInfo;
+//import com.ibm.ws.kernel.productinfo.ProductInfo;
 
 import componenttest.annotation.Server;
 import componenttest.custom.junit.runner.FATRunner;
@@ -56,7 +54,7 @@ public class DifferentServicePortTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        isBeta = isBeta();
+        isBeta = true;
         trustAll();
         server.startServer();
         String line = server.waitForStringInLog("CWWKF0011I");
@@ -179,19 +177,19 @@ public class DifferentServicePortTest {
         return server.waitForStringInLogUsingMark("CWWKG0017I.*|CWWKG0018I.*");
     }
 
-    private static boolean isBeta() {
-        try {
-            final Map<String, ProductInfo> productInfos = ProductInfo.getAllProductInfo(new File(server.getInstallRoot()));
-            for (ProductInfo info : productInfos.values()) {
-                if (EARLY_ACCESS.equals(info.getEdition())) {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            Log.debug(c, "Exception getting InstalledProductInfo: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return false;
-    }
+//    private static boolean isBeta() {
+//        try {
+//            final Map<String, ProductInfo> productInfos = ProductInfo.getAllProductInfo(new File(server.getInstallRoot()));
+//            for (ProductInfo info : productInfos.values()) {
+//                if (EARLY_ACCESS.equals(info.getEdition())) {
+//                    return true;
+//                }
+//            }
+//        } catch (Exception e) {
+//            Log.debug(c, "Exception getting InstalledProductInfo: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
 
 }
