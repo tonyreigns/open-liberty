@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -19,6 +19,7 @@ import java.util.concurrent.Future;
 
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
+import com.ibm.ws.collector.Target;
 import com.ibm.ws.ffdc.annotation.FFDCIgnore;
 import com.ibm.ws.logging.synch.ThreadLocalHandler;
 
@@ -62,7 +63,41 @@ public class TaskImpl extends Task implements Runnable {
                     if (TraceComponent.isAnyTracingEnabled() && tc.isDebugEnabled()) {
                         Tr.debug(tc, "Received event ", this, this.config.getSourceName(), event);
                     }
+
                     processEvent(event);
+
+                    // Only check for CWWKT0017I if:
+                    // 1. This task is configured to monitor for it (message source IS configured)
+                    // 2. Server stopping has been initiated (ShutdownSignal.isShutdownRequested())
+                    if (getMonitorWebAppRemoval() && com.ibm.ws.logging.collector.ShutdownSignal.isShutdownRequested()) {
+                        java.lang.reflect.Method getMessageMethod = event.getClass().getMethod("getMessage");
+                        String message = (String) getMessageMethod.invoke(event);
+
+                        if (message != null && message.contains("CWWKT0017I")) {
+                            // Flush the events buffer before shutting down
+                            if (eventsBuffer != null) {
+                                eventsBuffer.flushBuffer();
+                                Tr.info(tc, "Events buffer flushed");
+                            }
+
+                            // Stop the events buffer
+                            eventsBuffer.stop();
+
+                            // Stop all tasks and close TaskManager
+                            if (formatter instanceof com.ibm.ws.collector.Collector) {
+                                com.ibm.ws.collector.Collector collector = (com.ibm.ws.collector.Collector) formatter;
+                                collector.stopAllTasks();
+
+                                // Close the TaskManager (Target)
+                                Target target = collector.getTarget();
+                                if (target != null) {
+                                    target.close();
+                                }
+                            }
+                            done = true;
+                            break;
+                        }
+                    }
 
                 } catch (IllegalArgumentException exit) {
                     //Exit
