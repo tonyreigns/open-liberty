@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2019 IBM Corporation and others.
+ * Copyright (c) 2016, 2026 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -193,7 +193,7 @@ public class TaskImpl extends Task implements Runnable {
         /**
          * Initialize the maximum number of events going through at windowDuration ms
          *
-         * @param maxEvents maximum number of events specified
+         * @param maxEvents      maximum number of events specified
          * @param windowDuration the window time frame in milliseconds for the number of maxEvents specified
          */
         public Throttler(int maxEvents, long windowDuration) {
