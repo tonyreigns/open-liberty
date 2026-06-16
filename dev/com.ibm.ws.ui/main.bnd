@@ -16,7 +16,7 @@ Bundle-SymbolicName: com.ibm.ws.ui
 Bundle-Description: Provides the Admin Center toolbox and catalog
 
 Web-ContextPath: /adminCenter
-OL-VirtualHost: ${admin.virtual.host}
+OL-VirtualHost: liberty_admin_host
 
 IBM-Authorization-Roles: com.ibm.ws.management
 

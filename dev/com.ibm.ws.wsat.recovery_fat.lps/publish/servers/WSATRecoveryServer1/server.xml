@@ -25,6 +25,13 @@
   		clientInactivityTimeout="15s"
   	/>
 
+   <httpEndpoint id="adminHttpEndpoint" httpPort="9082" httpsPort="9445" host="localhost" />
+
+  	<virtualHost id="liberty_admin_host"> 
+        <hostAlias>localhost:9082</hostAlias>
+        <hostAlias>localhost:9445</hostAlias>
+    </virtualHost>
+
 	<wsAtomicTransaction asyncResponseTimeout="60000"/>
 
 	<javaPermission name="*" actions="*" className="java.security.AllPermission"/>
