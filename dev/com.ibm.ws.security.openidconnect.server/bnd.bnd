@@ -19,6 +19,7 @@ bVersion=1.0
 #
 
 Web-ContextPath: /oidc
+#OL-VirtualHost: liberty_ops_host
 
 IBM-Authorization-Roles: com.ibm.ws.security.oauth20
 
@@ -196,6 +197,6 @@ Include-Resource: \
 	com.ibm.ws.threading;verison=latest,\
 	com.ibm.ws.config;version=latest,\
 	org.mockito:mockito-core;version=4.11.0, \
-  	org.mockito:mockito-inline;version=4.11.0, \
-  	net.bytebuddy:byte-buddy;version=1.16.1, \
-  	net.bytebuddy:byte-buddy-agent;version=1.16.1
+  org.mockito:mockito-inline;version=4.11.0, \
+  net.bytebuddy:byte-buddy;version=1.17.8, \
+  net.bytebuddy:byte-buddy-agent;version=1.17.8

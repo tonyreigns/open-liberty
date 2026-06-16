@@ -15,6 +15,7 @@ bVersion=1.0
 
 IBM-Web-Extension-Processing-Disabled: true
 Web-ContextPath: @openAPIDOCPATH
+OL-VirtualHost: liberty_admin_host
 
 src: src, resources
 

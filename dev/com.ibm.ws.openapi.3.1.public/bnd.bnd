@@ -20,6 +20,7 @@ Bundle-SymbolicName: com.ibm.ws.openapi.3.1.public
 Bundle-Description: Project for Public OpenAPI; version=${bVersion}
 
 Web-ContextPath: @publicOpenAPIDocsURL
+OL-VirtualHost: liberty_admin_host
 
 WS-TraceGroup: OpenAPI
 

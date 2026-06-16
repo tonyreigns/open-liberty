@@ -6,6 +6,7 @@ Bundle-SymbolicName: com.ibm.ws.microprofile.openapi.ui
 Bundle-Description: OpenAPI User Interface, version ${bVersion}
 
 Web-ContextPath: @openAPIUIPATH
+OL-VirtualHost: liberty_admin_host
 
 IBM-Authorization-Roles: com.ibm.ws.management
 

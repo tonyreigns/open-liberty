@@ -18,7 +18,7 @@ Bundle-SymbolicName: com.ibm.ws.ui.tool.javaBatch
 Bundle-Description: WebSphere Admin Center Java Batch, version ${bVersion}
 
 Web-ContextPath: /ibm/adminCenter/javaBatch-1.0
-OL-VirtualHost: ${admin.virtual.host}
+OL-VirtualHost: liberty_admin_host
 
 IBM-Authorization-Roles: com.ibm.ws.management
 

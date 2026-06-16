@@ -109,7 +109,7 @@ public final class ExecutorServiceImpl implements WSExecutorService, ThreadQuies
     /**
      * Amount of time to wait for quiesce work to complete before continuing with shutdown.
      */
-    final static int MINIMUM_QUIESCE_TIMEOUT = 30;
+    final static int MINIMUM_QUIESCE_TIMEOUT = 10;
     protected int quiesceTimeout = MINIMUM_QUIESCE_TIMEOUT;
 
     /**

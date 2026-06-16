@@ -20,6 +20,7 @@ bVersion=1.0
 
 
 Web-ContextPath: /ibm/wsatservice
+OL-VirtualHost: liberty_admin_host
 
 WS-TraceGroup: WSAT
 

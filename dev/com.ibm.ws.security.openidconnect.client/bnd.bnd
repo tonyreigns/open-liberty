@@ -25,6 +25,7 @@ bVersion=1.0
 
 #Web-ContextPath: /oidcclient
 Web-ContextPath: @oidcClientWebapp
+#OL-VirtualHost: liberty_admin_host
 
 IBM-Authorization-Roles: com.ibm.ws.security.oidcclient10
 
