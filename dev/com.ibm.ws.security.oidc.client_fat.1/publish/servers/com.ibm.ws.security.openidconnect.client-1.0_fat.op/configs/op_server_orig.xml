@@ -13,6 +13,7 @@
 
 <server>
 
+
 	<include location="${server.config.dir}/imports/oidcServerFeatures.xml" />
 
 	<include location="${server.config.dir}/imports/goodBasicRegistry.xml" />
@@ -39,4 +40,11 @@
 
 	<include location="${server.config.dir}/imports/op_fatTestPorts.xml" />
 
+   <httpEndpoint id="adminHttpEndpoint" httpPort="9082" httpsPort="9445" host="localhost" />
+
+    <virtualHost id="liberty_admin_host"> 
+        <hostAlias>localhost:9082</hostAlias>
+        <hostAlias>localhost:9445</hostAlias>
+    </virtualHost>
+    
 </server>
